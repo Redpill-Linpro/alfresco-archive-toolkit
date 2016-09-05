@@ -9,5 +9,7 @@
       </list>
     </property>
   </bean>
+  
+  <bean id="archive-toolkit.evaluator.doclib.action.isAdmin" class="org.redpill.alfresco.archive.share.evaluator.IsAdmin" />
 
 </beans>

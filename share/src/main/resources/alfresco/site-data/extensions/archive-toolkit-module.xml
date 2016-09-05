@@ -1,0 +1,32 @@
+<extension>
+
+
+  <modules>
+    <module>
+      <id>Archive Toolkit - Create PDF Rendition Action</id>
+      <auto-deploy>false</auto-deploy>
+      <version>${project.version}</version>
+
+      <configurations>
+
+        <config evaluator="string-compare" condition="DocLibActions">
+          <actions>
+            <action id="archive-toolkit-create-pdf-rendition" type="javascript" label="actions.archive-toolkit-create-pdf-rendition">
+              <param name="function">onActionSimpleRepoAction</param>
+              <param name="action">archive-toolkit-convert-to-pdf</param>
+              <param name="successMessage">message.archive-toolkit-convert-to-pdf-rendition.success</param>
+              <param name="failureMessage">message.archive-toolkit-convert-to-pdf-rendition.failure</param>
+              <evaluator>archive-toolkit.evaluator.doclib.action.isAdmin</evaluator>
+            </action>
+          </actions>
+          <actionGroups>
+            <actionGroup id="document-details">
+              <action index="999" id="archive-toolkit-create-pdf-rendition" />            
+            </actionGroup>
+          </actionGroups>
+        </config>
+
+      </configurations>
+    </module>
+  </modules>
+</extension>
