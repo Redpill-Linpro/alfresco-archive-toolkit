@@ -1,12 +1,16 @@
-*.class
+.project
+.settings
+.classpath
+target
+alf_data_dev
+repo/.xml/
+*~
+/reset.sh
+repo/src/test/resources/test-offsprings/*
 
-# Mobile Tools for Java (J2ME)
-.mtj.tmp/
-
-# Package Files #
-*.jar
-*.war
-*.ear
-
-# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
-hs_err_pid*
+# Ignoring backup files that mergetool meld creates
+*.LOCAL.*
+*.BASE.*
+*.BACKUP.*
+*.REMOTE.*
+*.orig
