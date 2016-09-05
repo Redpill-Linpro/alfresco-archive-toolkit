@@ -19,18 +19,18 @@ The build produces several jar files. Attach them to your own maven project usin
 Repository dependency:
 ```xml
 <dependency>
-    <groupId>xxx</groupId>
-    <artifactId>yyy</artifactId>
-    <version>1.0.0</version>
+  <groupId>org.redpill-linpro.alfresco.archive</groupId>
+  <artifactId>alfresco-archive-toolkit</artifactId>
+  <version>1.0.0</version>
 </dependency>
 ```
 
 Share dependency:
 ```xml
 <dependency>
-    <groupId>xxx</groupId>
-    <artifactId>yyy</artifactId>
-    <version>1.0.0</version>
+  <groupId>org.redpill-linpro.alfresco.archive</groupId>
+  <artifactId>alfresco-archive-toolkit</artifactId>    
+  <version>1.0.0</version>
 </dependency>
 ```
 
@@ -42,7 +42,7 @@ Maven repository:
 </repository>
 ```
 
-The jar files are also downloadable from: https://maven.redpill-linpro.com/nexus/index.html#nexus-search;quick~xxx
+The jar files are also downloadable from: https://maven.redpill-linpro.com/nexus/index.html#nexus-search;quick~alfresco-archive-toolkit
 
 
 License
