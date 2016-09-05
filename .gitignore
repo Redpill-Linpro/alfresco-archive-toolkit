@@ -1,12 +1,10 @@
+*.class
+
 .project
 .settings
 .classpath
 target
 alf_data_dev
-repo/.xml/
-*~
-/reset.sh
-repo/src/test/resources/test-offsprings/*
 
 # Ignoring backup files that mergetool meld creates
 *.LOCAL.*
@@ -14,3 +12,6 @@ repo/src/test/resources/test-offsprings/*
 *.BACKUP.*
 *.REMOTE.*
 *.orig
+
+# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
+hs_err_pid*
