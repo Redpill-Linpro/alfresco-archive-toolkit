@@ -1,3 +1,22 @@
+/*
+ * Copyright (C) 2005-2013 Alfresco Software Limited.
+ *
+ * This file is part of Alfresco
+ *
+ * Alfresco is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Alfresco is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with Alfresco. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package org.redpill.alfresco.archive.repo.action.executor;
 
 import java.util.List;
@@ -6,6 +25,7 @@ import org.alfresco.query.PagingRequest;
 import org.alfresco.query.PagingResults;
 import org.alfresco.repo.action.ParameterDefinitionImpl;
 import org.alfresco.repo.action.executer.ActionExecuterAbstractBase;
+import org.alfresco.repo.content.MimetypeMap;
 
 import org.alfresco.service.cmr.action.Action;
 import org.alfresco.service.cmr.action.ParameterDefinition;
@@ -27,10 +47,14 @@ import org.alfresco.service.namespace.QName;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-public class CreatePdfActionExecuter extends ActionExecuterAbstractBase {
+/**
+ * Action to create pdf or pdfa. Based on the org.alfresco.repo.action.executer.TransformActionExecuter
+ * @author Marcus Svartmark - Redpill Linpro AB
+ */
+public class ConvertToPdfActionExecuter extends ActionExecuterAbstractBase {
 
   public static final String NAME = "archive-toolkit-convert-to-pdf";
-  private static Log logger = LogFactory.getLog(CreatePdfActionExecuter.class);
+  private final static Log LOGGER = LogFactory.getLog(ConvertToPdfActionExecuter.class);
   /* Error messages */
   public static final String ERR_OVERWRITE = "Unable to overwrite copy because more than one have been found.";
   private static final String CONTENT_READER_NOT_FOUND_MESSAGE = "Can not find Content Reader for document. Operation can't be performed";
@@ -46,8 +70,10 @@ public class CreatePdfActionExecuter extends ActionExecuterAbstractBase {
   public static final String PARAM_DESTINATION_FOLDER = "destination-folder";
   public static final String PARAM_ASSOC_TYPE_QNAME = "assoc-type";
   public static final String PARAM_ASSOC_QNAME = "assoc-name";
+  public static final String PARAM_TARGET_NAME = "target-name";
   public static final String PARAM_OVERWRITE_COPY = "overwrite-copy";
 
+  public static final String FAKE_MIMETYPE_PDFA = "application/pdfa";
   /*
      * Injected services
    */
@@ -57,12 +83,6 @@ public class CreatePdfActionExecuter extends ActionExecuterAbstractBase {
   private ContentService contentService;
   private CopyService copyService;
   private MimetypeService mimetypeService;
-
-  /**
-   * Properties (needed to avoid changing method signatures)
-   */
-  @Deprecated
-  protected TransformationOptions options;
 
   /**
    * Set the mime type service
@@ -116,6 +136,8 @@ public class CreatePdfActionExecuter extends ActionExecuterAbstractBase {
     paramList.add(new ParameterDefinitionImpl(PARAM_ASSOC_TYPE_QNAME, DataTypeDefinition.QNAME, false, getParamDisplayLabel(PARAM_ASSOC_TYPE_QNAME)));
     paramList.add(new ParameterDefinitionImpl(PARAM_ASSOC_QNAME, DataTypeDefinition.QNAME, false, getParamDisplayLabel(PARAM_ASSOC_QNAME)));
     paramList.add(new ParameterDefinitionImpl(PARAM_OVERWRITE_COPY, DataTypeDefinition.BOOLEAN, false, getParamDisplayLabel(PARAM_OVERWRITE_COPY)));
+    paramList.add(new ParameterDefinitionImpl(PARAM_TARGET_NAME, DataTypeDefinition.TEXT, false, getParamDisplayLabel(PARAM_TARGET_NAME)));
+
   }
 
   /**
@@ -125,8 +147,8 @@ public class CreatePdfActionExecuter extends ActionExecuterAbstractBase {
    */
   @Override
   protected void executeImpl(Action ruleAction, NodeRef actionedUponNodeRef) {
-    if (logger.isTraceEnabled()) {
-      logger.trace("Starting transformation to pdf for " + actionedUponNodeRef);
+    if (LOGGER.isTraceEnabled()) {
+      LOGGER.trace("Starting transformation to pdf for " + actionedUponNodeRef);
     }
 
     {
@@ -179,7 +201,18 @@ public class CreatePdfActionExecuter extends ActionExecuterAbstractBase {
 
       // Calculate the destination name
       String originalName = (String) nodeService.getProperty(actionedUponNodeRef, ContentModel.PROP_NAME);
-      String newName = transformName(this.mimetypeService, originalName, mimeType, true);
+      String targetName = (String) ruleAction.getParameterValue(PARAM_TARGET_NAME);
+      String selectedName;
+      if (targetName != null) {
+        selectedName = targetName;
+      } else {
+        selectedName = originalName;
+      }
+      String newMimetype = mimeType;
+      if (FAKE_MIMETYPE_PDFA.equalsIgnoreCase(mimeType)) {
+        newMimetype = MimetypeMap.MIMETYPE_PDF;
+      }
+      String newName = transformName(this.mimetypeService, selectedName, newMimetype, true);
 
       // Since we are overwriting we need to figure out whether the destination node exists
       NodeRef copyNodeRef = null;
@@ -231,7 +264,7 @@ public class CreatePdfActionExecuter extends ActionExecuterAbstractBase {
       if (contentReader != null) {
         // get the writer and set it up
         ContentWriter contentWriter = this.contentService.getWriter(copyNodeRef, ContentModel.PROP_CONTENT, true);
-        contentWriter.setMimetype(mimeType);                        // new mimetype
+        contentWriter.setMimetype(newMimetype);                        // new mimetype
         contentWriter.setEncoding(contentReader.getEncoding());     // original encoding
 
         // Try and transform the content - failures are caught and allowed to fail silently.
@@ -242,8 +275,8 @@ public class CreatePdfActionExecuter extends ActionExecuterAbstractBase {
           doTransform(ruleAction, actionedUponNodeRef, contentReader, copyNodeRef, contentWriter);
           ruleAction.setParameterValue(PARAM_RESULT, copyNodeRef);
         } catch (NoTransformerException e) {
-          if (logger.isDebugEnabled()) {
-            logger.debug("No transformer found to execute rule: \n"
+          if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("No transformer found to execute rule: \n"
                     + "   reader: " + contentReader + "\n"
                     + "   writer: " + contentWriter + "\n"
                     + "   action: " + this);
@@ -252,8 +285,8 @@ public class CreatePdfActionExecuter extends ActionExecuterAbstractBase {
         }
       }
 
-      if (logger.isTraceEnabled()) {
-        logger.trace("Finished transformation to pdf for " + actionedUponNodeRef);
+      if (LOGGER.isTraceEnabled()) {
+        LOGGER.trace("Finished transformation to pdf for " + actionedUponNodeRef);
       }
     }
   }
