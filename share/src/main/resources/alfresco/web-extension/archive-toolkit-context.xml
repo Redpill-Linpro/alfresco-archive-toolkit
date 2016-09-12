@@ -9,7 +9,14 @@
       </list>
     </property>
   </bean>
-  
+
   <bean id="archive-toolkit.evaluator.doclib.action.isAdmin" class="org.redpill.alfresco.archive.share.evaluator.IsAdmin" />
 
+  <bean id="archive-toolkit.doclib.action.isPdfMimetype" parent="evaluator.doclib.action.isMimetype">
+    <property name="mimetypes">
+      <list>
+        <value>application/pdf</value>
+      </list>
+    </property>
+  </bean>
 </beans>

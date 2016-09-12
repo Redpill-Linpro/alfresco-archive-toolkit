@@ -21,6 +21,7 @@
               <param name="successMessage">message.archive-toolkit-convert-to-pdf-rendition.success</param>
               <param name="failureMessage">message.archive-toolkit-convert-to-pdf-rendition.failure</param>
               <evaluator>archive-toolkit.evaluator.doclib.action.isAdmin</evaluator>
+              <evaluator>archive-toolkit.doclib.action.isPdfMimetype</evaluator>
             </action>
             <action id="archive-toolkit-create-pdfa-rendition" type="javascript" label="actions.archive-toolkit-create-pdfa-rendition">
               <param name="function">onActionSimpleRepoAction</param>
@@ -34,6 +35,7 @@
               <param name="successMessage">message.archive-toolkit-convert-to-pdfa-rendition.success</param>
               <param name="failureMessage">message.archive-toolkit-convert-to-pdfa-rendition.failure</param>
               <evaluator>archive-toolkit.evaluator.doclib.action.isAdmin</evaluator>
+              <evaluator>archive-toolkit.doclib.action.isPdfMimetype</evaluator>
             </action>
             
           </actions>
