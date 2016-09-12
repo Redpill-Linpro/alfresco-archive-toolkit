@@ -40,7 +40,7 @@
                 <value>-sDEVICE=pdfwrite</value>
                 <value>-sPDFACompatibilityPolicy=1</value>
                 <value>-sOutputFile=${target}</value>
-                <value>${pdfa.definition.file}</value>
+                <!-- <value>${pdfa.definition.file}</value> -->
                 <value>${source}</value>
               </list>
             </entry>
