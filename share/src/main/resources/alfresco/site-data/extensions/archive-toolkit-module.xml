@@ -14,6 +14,12 @@
             <action id="archive-toolkit-create-pdf-rendition" type="javascript" label="actions.archive-toolkit-create-pdf-rendition">
               <param name="function">onActionSimpleRepoAction</param>
               <param name="action">archive-toolkit-convert-to-pdf</param>
+              <param name="mime-type">application/pdf</param>
+              <param name="destination-folder">{nodeRef}</param>
+              <param name="assoc-type">rn:rendition</param>
+              <param name="assoc-name">pdf</param>
+              <param name="target-name">pdf</param>
+              <param name="overwrite-copy">false</param>
               <param name="successMessage">message.archive-toolkit-convert-to-pdf-rendition.success</param>
               <param name="failureMessage">message.archive-toolkit-convert-to-pdf-rendition.failure</param>
               <evaluator>archive-toolkit.evaluator.doclib.action.isAdmin</evaluator>
