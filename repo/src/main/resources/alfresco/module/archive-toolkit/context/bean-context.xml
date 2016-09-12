@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
-  <bean id="transformer.worker.Pdf2Pdfa" class="org.redpill.alfresco.archive.repo.content.transform.PdfToPdfaContentTransformerWorker">
+  <bean id="transformer.worker.Pdf2Pdfa" class="org.alfresco.repo.content.transform.RuntimeExecutableContentTransformerWorker">
     <property name="mimetypeService">
       <ref bean="mimetypeService" />
     </property>
@@ -40,7 +40,6 @@
                 <value>-sDEVICE=pdfwrite</value>
                 <value>-sPDFACompatibilityPolicy=1</value>
                 <value>-sOutputFile=${target}</value>
-                <!-- <value>${pdfa.definition.file}</value> -->
                 <value>${source}</value>
               </list>
             </entry>
