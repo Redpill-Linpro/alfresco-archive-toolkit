@@ -41,7 +41,7 @@ public class ConvertToPdfActionExecuterIntegrationTest extends AbstractRepoInteg
   }
 
   
-  //@Test
+  @Test
   public void testConvertDocxToPdf() throws InterruptedException {
     NodeRef document = uploadDocument(site, "test.docx").getNodeRef();
     
