@@ -59,6 +59,7 @@
       <ref bean="transformer.worker.Pdf2Pdfa" />
     </property>
   </bean>
+
   <bean id="archive-toolkit-transform-to-pdf" class="org.redpill.alfresco.archive.repo.action.executor.ConvertToPdfActionExecuter" parent="action-executer">
     <property name="dictionaryService" ref="dictionaryService" />
     <property name="nodeService" ref="NodeService" />

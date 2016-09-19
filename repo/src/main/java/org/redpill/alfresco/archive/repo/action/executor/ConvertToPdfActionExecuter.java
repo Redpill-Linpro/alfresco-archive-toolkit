@@ -53,7 +53,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class ConvertToPdfActionExecuter extends ActionExecuterAbstractBase {
 
-  public static final String NAME = "archive-toolkit-convert-to-pdf";
+  public static final String NAME = "archive-toolkit-transform-to-pdf";
   private final static Log LOGGER = LogFactory.getLog(ConvertToPdfActionExecuter.class);
   /* Error messages */
   public static final String ERR_OVERWRITE = "Unable to overwrite copy because more than one have been found.";
@@ -192,7 +192,7 @@ public class ConvertToPdfActionExecuter extends ActionExecuterAbstractBase {
         destinationAssocQName = QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "copy");
       }
 
-      // Get the overwirte value
+      // Get the overwrite value
       boolean overwrite = true;
       Boolean overwriteValue = (Boolean) ruleAction.getParameterValue(PARAM_OVERWRITE_COPY);
       if (overwriteValue != null) {
