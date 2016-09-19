@@ -42,8 +42,8 @@ public class ConvertToPdfActionExecuterIntegrationTest extends AbstractRepoInteg
 
   
   @Test
-  public void testConvertDocxToPdf() throws InterruptedException {
-    NodeRef document = uploadDocument(site, "test.docx").getNodeRef();
+  public void testConvertOdtToPdf() throws InterruptedException {
+    NodeRef document = uploadDocument(site, "test.odt").getNodeRef();
     
     Action action = actionService.createAction(ConvertToPdfActionExecuter.NAME);
     action.setParameterValue(ConvertToPdfActionExecuter.PARAM_MIME_TYPE, MimetypeMap.MIMETYPE_PDF);
