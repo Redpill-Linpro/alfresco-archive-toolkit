@@ -50,12 +50,12 @@ public class ConvertToPdfActionExecuterIntegrationTest extends AbstractRepoInteg
 
   @Test
   public void testConvertOdtToPdf() throws InterruptedException {
-    NodeRef document = uploadDocument(site, "test.odt").getNodeRef();
+    NodeRef document = uploadDocument(site, "test.docx").getNodeRef();
 
     //Make sure we have an odt document. For some reason Alfresco does not seem to detect it automatically. Instead it recognizes an application/zip.
-    ContentData cd = (ContentData) _nodeService.getProperty(document, ContentModel.PROP_CONTENT);
-    ContentData newCD = ContentData.setMimetype(cd, MimetypeMap.MIMETYPE_OPENDOCUMENT_TEXT);
-    _nodeService.setProperty(document, ContentModel.PROP_CONTENT, newCD);
+    //ContentData cd = (ContentData) _nodeService.getProperty(document, ContentModel.PROP_CONTENT);
+    //ContentData newCD = ContentData.setMimetype(cd, MimetypeMap.MIMETYPE_OPENDOCUMENT_TEXT);
+    //_nodeService.setProperty(document, ContentModel.PROP_CONTENT, newCD);
 
     Action action = actionService.createAction(ConvertToPdfActionExecuter.NAME);
     action.setParameterValue(ConvertToPdfActionExecuter.PARAM_MIME_TYPE, MimetypeMap.MIMETYPE_PDF);
