@@ -103,6 +103,62 @@ public class ConvertToPdfActionExecuterIntegrationTest extends AbstractRepoInteg
     //Assert that there is a child node with name pdfa
     assertEquals("pdfa", _nodeService.getProperty(childNodeRef, ContentModel.PROP_NAME));
   }
+  
+  @Test
+  public void testConvertPdfToPdfaUsingNames() throws InterruptedException {
+    NodeRef document = uploadDocument(site, "test.pdf").getNodeRef();
+
+    Action action = actionService.createAction(ConvertToPdfActionExecuter.NAME);
+    action.setParameterValue(ConvertToPdfActionExecuter.PARAM_MIME_TYPE, ConvertToPdfActionExecuter.FAKE_MIMETYPE_PDFA);
+    action.setParameterValue(ConvertToPdfActionExecuter.PARAM_DESTINATION_FOLDER, document);
+    action.setParameterValue(ConvertToPdfActionExecuter.PARAM_ASSOC_TYPE_QNAME, RenditionModel.ASSOC_RENDITION);
+    QName renditionQName = QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, (String) RENDITION_NAME_PDF);
+    action.setParameterValue(ConvertToPdfActionExecuter.PARAM_ASSOC_QNAME, renditionQName);
+    action.setParameterValue(ConvertToPdfActionExecuter.PARAM_TARGET_NAME, RENDITION_NAME_PDF);
+    action.setParameterValue(ConvertToPdfActionExecuter.PARAM_ADD_EXTENSION, false);
+    action.setParameterValue(ConvertToPdfActionExecuter.PARAM_OVERWRITE_COPY, false);
+
+    actionService.executeAction(action, document);
+
+    List<ChildAssociationRef> childAssocs = _nodeService.getChildAssocs(document);
+    assertNotNull(childAssocs);
+    assertEquals(1, childAssocs.size());
+    ChildAssociationRef childNode = childAssocs.get(0);
+    NodeRef childNodeRef = childNode.getChildRef();
+    assertNotNull(childNodeRef);
+    //Assert that there is a child node with name pdfa
+    assertEquals(RENDITION_NAME_PDF, _nodeService.getProperty(childNodeRef, ContentModel.PROP_NAME));
+    
+    action = actionService.createAction(ConvertToPdfActionExecuter.NAME);
+    action.setParameterValue(ConvertToPdfActionExecuter.PARAM_MIME_TYPE, ConvertToPdfActionExecuter.FAKE_MIMETYPE_PDFA);
+    action.setParameterValue(ConvertToPdfActionExecuter.PARAM_DESTINATION_FOLDER, document);
+    action.setParameterValue(ConvertToPdfActionExecuter.PARAM_ASSOC_TYPE_QNAME, RenditionModel.ASSOC_RENDITION);
+    renditionQName = QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, (String) RENDITION_NAME_PDFA);
+    action.setParameterValue(ConvertToPdfActionExecuter.PARAM_ASSOC_QNAME, renditionQName);
+    action.setParameterValue(ConvertToPdfActionExecuter.PARAM_TARGET_NAME, RENDITION_NAME_PDFA);
+    action.setParameterValue(ConvertToPdfActionExecuter.PARAM_ADD_EXTENSION, false);
+    action.setParameterValue(ConvertToPdfActionExecuter.PARAM_OVERWRITE_COPY, false);
+    action.setParameterValue(ConvertToPdfActionExecuter.PARAM_SOURCE_FILENAME, RENDITION_NAME_PDF);
+    action.setParameterValue(ConvertToPdfActionExecuter.PARAM_SOURCE_FOLDER, RENDITION_NAME_PDF);
+    
+    actionService.executeAction(action, childNodeRef);
+    
+    childAssocs = _nodeService.getChildAssocs(document);
+    assertNotNull(childAssocs);
+    assertEquals(2, childAssocs.size());
+    childNode = childAssocs.get(0);
+    childNodeRef = childNode.getChildRef();
+    assertNotNull(childNodeRef);
+    //Assert that there is a child node with name pdfa
+    assertEquals(RENDITION_NAME_PDF, _nodeService.getProperty(childNodeRef, ContentModel.PROP_NAME));
+    childNode = childAssocs.get(1);
+    childNodeRef = childNode.getChildRef();
+    assertNotNull(childNodeRef);
+    //Assert that there is a child node with name pdfa
+    assertEquals(RENDITION_NAME_PDFA, _nodeService.getProperty(childNodeRef, ContentModel.PROP_NAME));
+    
+    
+  }
 
   @Override
   public void afterClassSetup() {

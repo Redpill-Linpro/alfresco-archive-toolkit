@@ -19,6 +19,7 @@
 
 package org.redpill.alfresco.archive.repo.action.executor;
 
+import java.io.Serializable;
 import java.util.List;
 import org.alfresco.model.ContentModel;
 import org.alfresco.query.PagingRequest;
@@ -32,6 +33,7 @@ import org.alfresco.service.cmr.action.ParameterDefinition;
 import org.alfresco.service.cmr.coci.CheckOutCheckInService;
 import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
+import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.ContentReader;
 import org.alfresco.service.cmr.repository.ContentService;
 import org.alfresco.service.cmr.repository.ContentWriter;
@@ -74,6 +76,8 @@ public class ConvertToPdfActionExecuter extends ActionExecuterAbstractBase {
   public static final String PARAM_OVERWRITE_COPY = "overwrite-copy";
   public static final String PARAM_ADD_EXTENSION = "add-extension";
   public static final String FAKE_MIMETYPE_PDFA = "application/pdfa";
+  public static final String PARAM_SOURCE_FOLDER = "source-folder";
+  public static final String PARAM_SOURCE_FILENAME = "source-filename";
   /*
      * Injected services
    */
@@ -138,6 +142,9 @@ public class ConvertToPdfActionExecuter extends ActionExecuterAbstractBase {
     paramList.add(new ParameterDefinitionImpl(PARAM_OVERWRITE_COPY, DataTypeDefinition.BOOLEAN, false, getParamDisplayLabel(PARAM_OVERWRITE_COPY)));
     paramList.add(new ParameterDefinitionImpl(PARAM_TARGET_NAME, DataTypeDefinition.TEXT, false, getParamDisplayLabel(PARAM_TARGET_NAME)));
     paramList.add(new ParameterDefinitionImpl(PARAM_ADD_EXTENSION, DataTypeDefinition.BOOLEAN, false, getParamDisplayLabel(PARAM_ADD_EXTENSION)));
+    //As a fallback we can also look for a node to convert by source folder and filename. If these are supplied they superseed the node ref supplied with the action
+    paramList.add(new ParameterDefinitionImpl(PARAM_SOURCE_FOLDER, DataTypeDefinition.NODE_REF, false, getParamDisplayLabel(PARAM_SOURCE_FOLDER)));
+    paramList.add(new ParameterDefinitionImpl(PARAM_SOURCE_FILENAME, DataTypeDefinition.TEXT, false, getParamDisplayLabel(PARAM_SOURCE_FILENAME)));
     
     
   }
@@ -154,6 +161,21 @@ public class ConvertToPdfActionExecuter extends ActionExecuterAbstractBase {
     }
 
     {
+      
+      NodeRef sourceFolder = (NodeRef) ruleAction.getParameterValue(PARAM_SOURCE_FOLDER);
+      String sourceFilename = (String) ruleAction.getParameterValue(PARAM_SOURCE_FILENAME);
+      
+      if (sourceFolder!=null && sourceFilename!=null && nodeService.exists(sourceFolder)) {
+        List<ChildAssociationRef> childAssocs = nodeService.getChildAssocs(sourceFolder);
+        for (ChildAssociationRef childAssoc : childAssocs) {
+          NodeRef childRef = childAssoc.getChildRef();
+          Serializable property = nodeService.getProperty(childRef, ContentModel.PROP_NAME);
+          if (sourceFilename.equals(property)) {
+            actionedUponNodeRef = childRef;
+            break;
+          }
+        }
+      }
       if (this.nodeService.exists(actionedUponNodeRef) == false) {
         // node doesn't exist - can't do anything
         return;
