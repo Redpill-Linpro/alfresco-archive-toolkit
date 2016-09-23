@@ -62,6 +62,7 @@
   </bean>
 
   <bean id="archive-toolkit-transform-to-pdf" class="org.redpill.alfresco.archive.repo.action.executor.ConvertToPdfActionExecuter" parent="action-executer">
+    <property name="auditComponent" ref="auditComponent" />
     <property name="dictionaryService" ref="dictionaryService" />
     <property name="nodeService" ref="NodeService" />
     <property name="checkOutCheckInService" ref="CheckOutCheckInService" />
