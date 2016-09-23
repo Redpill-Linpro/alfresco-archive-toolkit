@@ -72,7 +72,7 @@ public class ConvertToPdfActionExecuter extends ActionExecuterAbstractBase {
   public static final String PARAM_ASSOC_QNAME = "assoc-name";
   public static final String PARAM_TARGET_NAME = "target-name";
   public static final String PARAM_OVERWRITE_COPY = "overwrite-copy";
-
+  public static final String PARAM_ADD_EXTENSION = "add-extension";
   public static final String FAKE_MIMETYPE_PDFA = "application/pdfa";
   /*
      * Injected services
@@ -137,7 +137,9 @@ public class ConvertToPdfActionExecuter extends ActionExecuterAbstractBase {
     paramList.add(new ParameterDefinitionImpl(PARAM_ASSOC_QNAME, DataTypeDefinition.QNAME, false, getParamDisplayLabel(PARAM_ASSOC_QNAME)));
     paramList.add(new ParameterDefinitionImpl(PARAM_OVERWRITE_COPY, DataTypeDefinition.BOOLEAN, false, getParamDisplayLabel(PARAM_OVERWRITE_COPY)));
     paramList.add(new ParameterDefinitionImpl(PARAM_TARGET_NAME, DataTypeDefinition.TEXT, false, getParamDisplayLabel(PARAM_TARGET_NAME)));
-
+    paramList.add(new ParameterDefinitionImpl(PARAM_ADD_EXTENSION, DataTypeDefinition.BOOLEAN, false, getParamDisplayLabel(PARAM_ADD_EXTENSION)));
+    
+    
   }
 
   /**
@@ -212,7 +214,13 @@ public class ConvertToPdfActionExecuter extends ActionExecuterAbstractBase {
       if (FAKE_MIMETYPE_PDFA.equalsIgnoreCase(mimeType)) {
         newMimetype = MimetypeMap.MIMETYPE_PDF;
       }
-      String newName = transformName(this.mimetypeService, selectedName, newMimetype, true);
+      // Get the overwrite value
+      boolean addExtension = true;
+      Boolean addExtensionValue = (Boolean) ruleAction.getParameterValue(PARAM_ADD_EXTENSION);
+      if (overwriteValue != null) {
+        addExtension = addExtensionValue.booleanValue();
+      }
+      String newName = transformName(this.mimetypeService, selectedName, newMimetype, addExtension);
 
       // Since we are overwriting we need to figure out whether the destination node exists
       NodeRef copyNodeRef = null;

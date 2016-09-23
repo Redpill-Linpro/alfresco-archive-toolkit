@@ -63,6 +63,7 @@
       <version>1.0.16</version>
       <scope>test</scope>
     </dependency>
+    <!--
     <dependency>
       <groupId>org.alfresco</groupId>
       <artifactId>alfresco-repository</artifactId>
@@ -70,6 +71,7 @@
       <classifier>h2scripts</classifier>
       <scope>test</scope>
     </dependency>
+    -->
   </dependencies>
 
   <build>
