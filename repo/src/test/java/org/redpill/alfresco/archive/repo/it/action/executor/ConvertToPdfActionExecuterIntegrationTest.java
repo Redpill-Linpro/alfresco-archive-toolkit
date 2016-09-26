@@ -2,6 +2,7 @@ package org.redpill.alfresco.archive.repo.it.action.executor;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.alfresco.model.ContentModel;
@@ -179,6 +180,10 @@ public class ConvertToPdfActionExecuterIntegrationTest extends AbstractRepoInteg
     action.setParameterValue(ConvertToPdfActionExecuter.PARAM_OVERWRITE_COPY, false);
 
     actionService.executeAction(action, document);
+    
+    final Map<String, Serializable> postValues = new HashMap<>();
+    final Map<String, Serializable> preValues = new HashMap<>();
+    
     final List<Boolean> assertList = new ArrayList<>();
     AuditQueryCallback callback = new AuditQueryCallback() {
 
@@ -192,6 +197,13 @@ public class ConvertToPdfActionExecuterIntegrationTest extends AbstractRepoInteg
         assertList.add(new Boolean(true));
         System.out.println("-----------------------------");
         if (values != null) {
+          if (values.containsKey("/alfresco-archive-toolkit/action/archive-toolkit-transform-to-pdf/pre/params/destination-folder")) {
+            preValues.putAll(values);
+          } else if (values.containsKey("/alfresco-archive-toolkit/action/archive-toolkit-transform-to-pdf/post/target/node")) {
+            postValues.putAll(values);
+          } else {
+            assertFalse("Unexpected audit entry: "+values.toString(), true);
+          }
           System.out.println("Not empty");
 //values.containsKey("/action/archive-toolkit-transform-to-pdf/node");
   //      System.out.println(values.get("/action/archive-toolkit-transform-to-pdf/node"));
@@ -224,6 +236,87 @@ public class ConvertToPdfActionExecuterIntegrationTest extends AbstractRepoInteg
     _authenticationComponent.setCurrentUser(oldUserName);
 
     assertEquals("Expected one audit record", 2, assertList.size());
+    
+    assertEquals("Wrong number of expected audit valeus in pre audit recrod", 11, preValues.size());
+    
+    assertEquals("Wrong number of expected audit valeus in post audit recrod", 11, postValues.size());
+  }
+  
+  @Test
+  public void testActionAuditError() {
+    NodeRef document = uploadDocument(site, "test.pdf", null, null, "test" + System.currentTimeMillis() + ".pdf").getNodeRef();
+
+    Action action = actionService.createAction(ConvertToPdfActionExecuter.NAME);
+    action.setParameterValue(ConvertToPdfActionExecuter.PARAM_MIME_TYPE, "application/xxxFake");
+    action.setParameterValue(ConvertToPdfActionExecuter.PARAM_DESTINATION_FOLDER, document);
+    action.setParameterValue(ConvertToPdfActionExecuter.PARAM_ASSOC_TYPE_QNAME, RenditionModel.ASSOC_RENDITION);
+    QName renditionQName = QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, (String) RENDITION_NAME_PDF);
+    action.setParameterValue(ConvertToPdfActionExecuter.PARAM_ASSOC_QNAME, renditionQName);
+    action.setParameterValue(ConvertToPdfActionExecuter.PARAM_TARGET_NAME, RENDITION_NAME_PDF);
+    action.setParameterValue(ConvertToPdfActionExecuter.PARAM_ADD_EXTENSION, false);
+    action.setParameterValue(ConvertToPdfActionExecuter.PARAM_OVERWRITE_COPY, false);
+
+    actionService.executeAction(action, document);
+    
+    final Map<String, Serializable> postValues = new HashMap<>();
+    final Map<String, Serializable> preValues = new HashMap<>();
+    
+    final List<Boolean> assertList = new ArrayList<>();
+    AuditQueryCallback callback = new AuditQueryCallback() {
+
+      @Override
+      public boolean valuesRequired() {
+        return true;
+      }
+
+      @Override
+      public boolean handleAuditEntry(Long entryId, String applicationName, String user, long time, Map<String, Serializable> values) {
+        assertList.add(new Boolean(true));
+        System.out.println("-----------------------------");
+        if (values != null) {
+          if (values.containsKey("/alfresco-archive-toolkit/action/archive-toolkit-transform-to-pdf/pre/params/destination-folder")) {
+            preValues.putAll(values);
+          } else if (values.containsKey("/alfresco-archive-toolkit/action/archive-toolkit-transform-to-pdf/post/target/node")) {
+            postValues.putAll(values);
+          } else {
+            assertFalse("Unexpected audit entry: "+values.toString(), true);
+          }
+          System.out.println("Not empty");
+//values.containsKey("/action/archive-toolkit-transform-to-pdf/node");
+  //      System.out.println(values.get("/action/archive-toolkit-transform-to-pdf/node"));
+          for (String key : values.keySet()) {
+            System.out.println(key + ": " + values.get(key));
+          }
+        } else {
+          System.out.println("Empty set of audit values");
+        }
+        System.out.println("-----------------------------");
+
+        return true;
+        //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+      }
+
+      @Override
+      public boolean handleAuditEntryError(Long entryId, String errorMsg, Throwable error) {
+        assertTrue("Did not expect any errors while processing audit records", false);
+        return false;
+      }
+    };
+    AuditQueryParameters parameters = new AuditQueryParameters();
+    parameters.setApplicationName(ConvertToPdfActionExecuter.AUDIT_APPLICATION_NAME);
+    parameters.addSearchKey("/alfresco-archive-toolkit/action/archive-toolkit-transform-to-pdf/node", document);
+    String oldUserName = _authenticationComponent.getCurrentUserName();
+    _authenticationComponent.clearCurrentSecurityContext();
+    _authenticationComponent.setCurrentUser(_authenticationComponent.getSystemUserName());
+    auditService.auditQuery(callback, parameters, 0);
+    _authenticationComponent.clearCurrentSecurityContext();
+    _authenticationComponent.setCurrentUser(oldUserName);
+
+    assertEquals("Expected one audit record", 2, assertList.size());
+    
+    assertEquals("Wrong number of expected audit valeus in pre audit recrod", 11, preValues.size());
+    
+    assertEquals("Wrong number of expected audit valeus in post audit recrod", 11, postValues.size());
   }
 
   @Override
