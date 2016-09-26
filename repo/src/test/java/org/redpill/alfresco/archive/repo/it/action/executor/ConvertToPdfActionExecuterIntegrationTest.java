@@ -15,6 +15,7 @@ import org.alfresco.service.cmr.audit.AuditService;
 import org.alfresco.service.cmr.audit.AuditService.AuditQueryCallback;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.rule.RuleServiceException;
 import org.alfresco.service.cmr.site.SiteInfo;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
@@ -26,6 +27,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 
 import static org.junit.Assert.*;
 import static org.junit.Assert.assertNotNull;
+
 public class ConvertToPdfActionExecuterIntegrationTest extends AbstractRepoIntegrationTest {
 
   private static final String RENDITION_NAME_PDF = "pdf";
@@ -180,10 +182,10 @@ public class ConvertToPdfActionExecuterIntegrationTest extends AbstractRepoInteg
     action.setParameterValue(ConvertToPdfActionExecuter.PARAM_OVERWRITE_COPY, false);
 
     actionService.executeAction(action, document);
-    
+
     final Map<String, Serializable> postValues = new HashMap<>();
     final Map<String, Serializable> preValues = new HashMap<>();
-    
+
     final List<Boolean> assertList = new ArrayList<>();
     AuditQueryCallback callback = new AuditQueryCallback() {
 
@@ -202,11 +204,8 @@ public class ConvertToPdfActionExecuterIntegrationTest extends AbstractRepoInteg
           } else if (values.containsKey("/alfresco-archive-toolkit/action/archive-toolkit-transform-to-pdf/post/target/node")) {
             postValues.putAll(values);
           } else {
-            assertFalse("Unexpected audit entry: "+values.toString(), true);
+            assertFalse("Unexpected audit entry: " + values.toString(), true);
           }
-          System.out.println("Not empty");
-//values.containsKey("/action/archive-toolkit-transform-to-pdf/node");
-  //      System.out.println(values.get("/action/archive-toolkit-transform-to-pdf/node"));
           for (String key : values.keySet()) {
             System.out.println(key + ": " + values.get(key));
           }
@@ -235,13 +234,13 @@ public class ConvertToPdfActionExecuterIntegrationTest extends AbstractRepoInteg
     _authenticationComponent.clearCurrentSecurityContext();
     _authenticationComponent.setCurrentUser(oldUserName);
 
-    assertEquals("Expected one audit record", 2, assertList.size());
-    
-    assertEquals("Wrong number of expected audit valeus in pre audit recrod", 11, preValues.size());
-    
-    assertEquals("Wrong number of expected audit valeus in post audit recrod", 11, postValues.size());
+    assertEquals("Expected correct number of audit records", 2, assertList.size());
+
+    assertEquals("Wrong number of expected audit valeus in pre audit record", 10, preValues.size());
+
+    assertEquals("Wrong number of expected audit valeus in post audit record", 12, postValues.size());
   }
-  
+
   @Test
   public void testActionAuditError() {
     NodeRef document = uploadDocument(site, "test.pdf", null, null, "test" + System.currentTimeMillis() + ".pdf").getNodeRef();
@@ -255,12 +254,15 @@ public class ConvertToPdfActionExecuterIntegrationTest extends AbstractRepoInteg
     action.setParameterValue(ConvertToPdfActionExecuter.PARAM_TARGET_NAME, RENDITION_NAME_PDF);
     action.setParameterValue(ConvertToPdfActionExecuter.PARAM_ADD_EXTENSION, false);
     action.setParameterValue(ConvertToPdfActionExecuter.PARAM_OVERWRITE_COPY, false);
+    try {
+      actionService.executeAction(action, document);
+      assertTrue(false);
+    } catch (RuleServiceException e) {
 
-    actionService.executeAction(action, document);
-    
-    final Map<String, Serializable> postValues = new HashMap<>();
+    }
+    final Map<String, Serializable> errorValues = new HashMap<>();
     final Map<String, Serializable> preValues = new HashMap<>();
-    
+
     final List<Boolean> assertList = new ArrayList<>();
     AuditQueryCallback callback = new AuditQueryCallback() {
 
@@ -276,14 +278,11 @@ public class ConvertToPdfActionExecuterIntegrationTest extends AbstractRepoInteg
         if (values != null) {
           if (values.containsKey("/alfresco-archive-toolkit/action/archive-toolkit-transform-to-pdf/pre/params/destination-folder")) {
             preValues.putAll(values);
-          } else if (values.containsKey("/alfresco-archive-toolkit/action/archive-toolkit-transform-to-pdf/post/target/node")) {
-            postValues.putAll(values);
+          } else if (values.containsKey("/alfresco-archive-toolkit/action/archive-toolkit-transform-to-pdf/error/params/mime-type")) {
+            errorValues.putAll(values);
           } else {
-            assertFalse("Unexpected audit entry: "+values.toString(), true);
+            assertFalse("Unexpected audit entry: " + values.toString(), true);
           }
-          System.out.println("Not empty");
-//values.containsKey("/action/archive-toolkit-transform-to-pdf/node");
-  //      System.out.println(values.get("/action/archive-toolkit-transform-to-pdf/node"));
           for (String key : values.keySet()) {
             System.out.println(key + ": " + values.get(key));
           }
@@ -312,11 +311,11 @@ public class ConvertToPdfActionExecuterIntegrationTest extends AbstractRepoInteg
     _authenticationComponent.clearCurrentSecurityContext();
     _authenticationComponent.setCurrentUser(oldUserName);
 
-    assertEquals("Expected one audit record", 2, assertList.size());
-    
-    assertEquals("Wrong number of expected audit valeus in pre audit recrod", 11, preValues.size());
-    
-    assertEquals("Wrong number of expected audit valeus in post audit recrod", 11, postValues.size());
+    assertEquals("Expected correct number of audit record", 2, assertList.size());
+
+    assertEquals("Wrong number of expected audit valeus in pre audit record", 10, preValues.size());
+
+    assertEquals("Wrong number of expected audit valeus in error audit record", 11, errorValues.size());
   }
 
   @Override

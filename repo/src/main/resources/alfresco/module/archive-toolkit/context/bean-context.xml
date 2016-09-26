@@ -69,6 +69,7 @@
     <property name="contentService" ref="ContentService" />
     <property name="copyService" ref="CopyService" />
     <property name="mimetypeService" ref="mimetypeService" />
+    <property name="retryingTransactionHelper" ref="retryingTransactionHelper" />
     <property name="applicableTypes">
       <list>
         <value>{http://www.alfresco.org/model/content/1.0}content</value>

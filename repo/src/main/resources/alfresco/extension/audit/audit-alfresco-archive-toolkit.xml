@@ -26,9 +26,7 @@
 
   <Application name="alfresco-archive-toolkit" key="alfresco-archive-toolkit">
     
-    <AuditPath key="action">
-        <RecordValue key="node" dataExtractor="simpleValue" dataSource="/alfresco-archive-toolkit/action/archive-toolkit-transform-to-pdf/node" dataTrigger="/alfresco-archive-toolkit/action/archive-toolkit-transform-to-pdf/node" />
-            
+    <AuditPath key="action">   
       <AuditPath key="archive-toolkit-transform-to-pdf">
         <RecordValue key="node" dataExtractor="simpleValue" dataSource="/alfresco-archive-toolkit/action/archive-toolkit-transform-to-pdf/node" dataTrigger="/alfresco-archive-toolkit/action/archive-toolkit-transform-to-pdf/node" />
         <AuditPath key="pre">
@@ -46,6 +44,19 @@
         </AuditPath>
         
         <AuditPath key="error">
+          <RecordValue key="message" dataExtractor="simpleValue" dataSource="/alfresco-archive-toolkit/action/archive-toolkit-transform-to-pdf/error/message" dataTrigger="/alfresco-archive-toolkit/action/archive-toolkit-transform-to-pdf/error/message" />  
+          <AuditPath key="causes">
+              <RecordValue key="1" dataExtractor="simpleValue" dataSource="/alfresco-archive-toolkit/action/archive-toolkit-transform-to-pdf/error/causes/1" dataTrigger="/alfresco-archive-toolkit/action/archive-toolkit-transform-to-pdf/error/causes/1" />  
+              <RecordValue key="2" dataExtractor="simpleValue" dataSource="/alfresco-archive-toolkit/action/archive-toolkit-transform-to-pdf/error/causes/2" dataTrigger="/alfresco-archive-toolkit/action/archive-toolkit-transform-to-pdf/error/causes/2" />  
+              <RecordValue key="3" dataExtractor="simpleValue" dataSource="/alfresco-archive-toolkit/action/archive-toolkit-transform-to-pdf/error/causes/3" dataTrigger="/alfresco-archive-toolkit/action/archive-toolkit-transform-to-pdf/error/causes/3" />  
+              <RecordValue key="4" dataExtractor="simpleValue" dataSource="/alfresco-archive-toolkit/action/archive-toolkit-transform-to-pdf/error/causes/4" dataTrigger="/alfresco-archive-toolkit/action/archive-toolkit-transform-to-pdf/error/causes/4" />  
+              <RecordValue key="5" dataExtractor="simpleValue" dataSource="/alfresco-archive-toolkit/action/archive-toolkit-transform-to-pdf/error/causes/5" dataTrigger="/alfresco-archive-toolkit/action/archive-toolkit-transform-to-pdf/error/causes/5" />  
+              <RecordValue key="6" dataExtractor="simpleValue" dataSource="/alfresco-archive-toolkit/action/archive-toolkit-transform-to-pdf/error/causes/6" dataTrigger="/alfresco-archive-toolkit/action/archive-toolkit-transform-to-pdf/error/causes/6" />  
+              <RecordValue key="7" dataExtractor="simpleValue" dataSource="/alfresco-archive-toolkit/action/archive-toolkit-transform-to-pdf/error/causes/7" dataTrigger="/alfresco-archive-toolkit/action/archive-toolkit-transform-to-pdf/error/causes/7" />  
+              <RecordValue key="8" dataExtractor="simpleValue" dataSource="/alfresco-archive-toolkit/action/archive-toolkit-transform-to-pdf/error/causes/8" dataTrigger="/alfresco-archive-toolkit/action/archive-toolkit-transform-to-pdf/error/causes/8" />  
+              <RecordValue key="9" dataExtractor="simpleValue" dataSource="/alfresco-archive-toolkit/action/archive-toolkit-transform-to-pdf/error/causes/9" dataTrigger="/alfresco-archive-toolkit/action/archive-toolkit-transform-to-pdf/error/causes/9" />  
+              <RecordValue key="10" dataExtractor="simpleValue" dataSource="/alfresco-archive-toolkit/action/archive-toolkit-transform-to-pdf/error/causes/10" dataTrigger="/alfresco-archive-toolkit/action/archive-toolkit-transform-to-pdf/error/causes/10" />  
+            </AuditPath>   
           <AuditPath key="params"> 
             <RecordValue key="source-filename" dataExtractor="simpleValue" dataSource="/alfresco-archive-toolkit/action/archive-toolkit-transform-to-pdf/error/params/source-filename" dataTrigger="/alfresco-archive-toolkit/action/archive-toolkit-transform-to-pdf/error/params/source-filename" />  
             <RecordValue key="add-extension" dataExtractor="simpleValue" dataSource="/alfresco-archive-toolkit/action/archive-toolkit-transform-to-pdf/error/params/add-extension" dataTrigger="/alfresco-archive-toolkit/action/archive-toolkit-transform-to-pdf/error/params/add-extension" /> 
@@ -56,33 +67,20 @@
             <RecordValue key="assoc-name" dataExtractor="simpleValue" dataSource="/alfresco-archive-toolkit/action/archive-toolkit-transform-to-pdf/error/params/assoc-name" dataTrigger="/alfresco-archive-toolkit/action/archive-toolkit-transform-to-pdf/error/params/assoc-name" /> 
             <RecordValue key="overwrite-copy" dataExtractor="simpleValue" dataSource="/alfresco-archive-toolkit/action/archive-toolkit-transform-to-pdf/error/params/overwrite-copy" dataTrigger="/alfresco-archive-toolkit/action/archive-toolkit-transform-to-pdf/error/params/overwrite-copy" />  
             <RecordValue key="source-folder" dataExtractor="simpleValue" dataSource="/alfresco-archive-toolkit/action/archive-toolkit-transform-to-pdf/error/params/source-folder" dataTrigger="/alfresco-archive-toolkit/action/archive-toolkit-transform-to-pdf/error/params/source-folder" />  
-            <RecordValue key="message" dataExtractor="simpleValue" dataSource="/alfresco-archive-toolkit/action/archive-toolkit-transform-to-pdf/error/params/message" dataTrigger="/alfresco-archive-toolkit/action/archive-toolkit-transform-to-pdf/error/params/message" />  
-            <AuditPath key="causes">
-              <RecordValue key="1" dataExtractor="simpleValue" dataSource="/alfresco-archive-toolkit/action/archive-toolkit-transform-to-pdf/error/params/causes/1" dataTrigger="/alfresco-archive-toolkit/action/archive-toolkit-transform-to-pdf/error/params/causes/1" />  
-              <RecordValue key="2" dataExtractor="simpleValue" dataSource="/alfresco-archive-toolkit/action/archive-toolkit-transform-to-pdf/error/params/causes/2" dataTrigger="/alfresco-archive-toolkit/action/archive-toolkit-transform-to-pdf/error/params/causes/2" />  
-              <RecordValue key="3" dataExtractor="simpleValue" dataSource="/alfresco-archive-toolkit/action/archive-toolkit-transform-to-pdf/error/params/causes/3" dataTrigger="/alfresco-archive-toolkit/action/archive-toolkit-transform-to-pdf/error/params/causes/3" />  
-              <RecordValue key="4" dataExtractor="simpleValue" dataSource="/alfresco-archive-toolkit/action/archive-toolkit-transform-to-pdf/error/params/causes/4" dataTrigger="/alfresco-archive-toolkit/action/archive-toolkit-transform-to-pdf/error/params/causes/4" />  
-              <RecordValue key="5" dataExtractor="simpleValue" dataSource="/alfresco-archive-toolkit/action/archive-toolkit-transform-to-pdf/error/params/causes/5" dataTrigger="/alfresco-archive-toolkit/action/archive-toolkit-transform-to-pdf/error/params/causes/5" />  
-              <RecordValue key="6" dataExtractor="simpleValue" dataSource="/alfresco-archive-toolkit/action/archive-toolkit-transform-to-pdf/error/params/causes/6" dataTrigger="/alfresco-archive-toolkit/action/archive-toolkit-transform-to-pdf/error/params/causes/6" />  
-              <RecordValue key="7" dataExtractor="simpleValue" dataSource="/alfresco-archive-toolkit/action/archive-toolkit-transform-to-pdf/error/params/causes/7" dataTrigger="/alfresco-archive-toolkit/action/archive-toolkit-transform-to-pdf/error/params/causes/7" />  
-              <RecordValue key="8" dataExtractor="simpleValue" dataSource="/alfresco-archive-toolkit/action/archive-toolkit-transform-to-pdf/error/params/causes/8" dataTrigger="/alfresco-archive-toolkit/action/archive-toolkit-transform-to-pdf/error/params/causes/8" />  
-              <RecordValue key="9" dataExtractor="simpleValue" dataSource="/alfresco-archive-toolkit/action/archive-toolkit-transform-to-pdf/error/params/causes/9" dataTrigger="/alfresco-archive-toolkit/action/archive-toolkit-transform-to-pdf/error/params/causes/9" />  
-              <RecordValue key="10" dataExtractor="simpleValue" dataSource="/alfresco-archive-toolkit/action/archive-toolkit-transform-to-pdf/error/params/causes/10" dataTrigger="/alfresco-archive-toolkit/action/archive-toolkit-transform-to-pdf/error/params/causes/10" />  
-            </AuditPath> 
           </AuditPath>
         </AuditPath>
         
         <AuditPath key="post">
           <AuditPath key="params"> 
-            <RecordValue key="source-filename" dataExtractor="simpleValue" dataSource="/alfresco-archive-toolkit/action/archive-toolkit-transform-to-pdf/target/params/source-filename" dataTrigger="/alfresco-archive-toolkit/action/archive-toolkit-transform-to-pdf/target/params/source-filename" />  
-            <RecordValue key="add-extension" dataExtractor="simpleValue" dataSource="/alfresco-archive-toolkit/action/archive-toolkit-transform-to-pdf/target/params/add-extension" dataTrigger="/alfresco-archive-toolkit/action/archive-toolkit-transform-to-pdf/target/params/add-extension" /> 
-            <RecordValue key="assoc-type" dataExtractor="simpleValue" dataSource="/alfresco-archive-toolkit/action/archive-toolkit-transform-to-pdf/target/params/assoc-type" dataTrigger="/alfresco-archive-toolkit/action/archive-toolkit-transform-to-pdf/target/params/assoc-type" />  
-            <RecordValue key="target-name" dataExtractor="simpleValue" dataSource="/alfresco-archive-toolkit/action/archive-toolkit-transform-to-pdf/target/params/target-name" dataTrigger="/alfresco-archive-toolkit/action/archive-toolkit-transform-to-pdf/target/params/target-name" />  
-            <RecordValue key="destination-folder" dataExtractor="simpleValue" dataSource="/alfresco-archive-toolkit/action/archive-toolkit-transform-to-pdf/target/params/destination-folder" dataTrigger="/alfresco-archive-toolkit/action/archive-toolkit-transform-to-pdf/target/params/destination-folder" />  
-            <RecordValue key="mime-type" dataExtractor="simpleValue" dataSource="/alfresco-archive-toolkit/action/archive-toolkit-transform-to-pdf/target/params/mime-type" dataTrigger="/alfresco-archive-toolkit/action/archive-toolkit-transform-to-pdf/target/params/mime-type" />  
-            <RecordValue key="assoc-name" dataExtractor="simpleValue" dataSource="/alfresco-archive-toolkit/action/archive-toolkit-transform-to-pdf/target/params/assoc-name" dataTrigger="/alfresco-archive-toolkit/action/archive-toolkit-transform-to-pdf/target/params/assoc-name" /> 
-            <RecordValue key="overwrite-copy" dataExtractor="simpleValue" dataSource="/alfresco-archive-toolkit/action/archive-toolkit-transform-to-pdf/target/params/overwrite-copy" dataTrigger="/alfresco-archive-toolkit/action/archive-toolkit-transform-to-pdf/target/params/overwrite-copy" />  
-            <RecordValue key="source-folder" dataExtractor="simpleValue" dataSource="/alfresco-archive-toolkit/action/archive-toolkit-transform-to-pdf/target/params/source-folder" dataTrigger="/alfresco-archive-toolkit/action/archive-toolkit-transform-to-pdf/target/params/source-folder" />   
+            <RecordValue key="source-filename" dataExtractor="simpleValue" dataSource="/alfresco-archive-toolkit/action/archive-toolkit-transform-to-pdf/post/params/source-filename" dataTrigger="/alfresco-archive-toolkit/action/archive-toolkit-transform-to-pdf/post/params/source-filename" />  
+            <RecordValue key="add-extension" dataExtractor="simpleValue" dataSource="/alfresco-archive-toolkit/action/archive-toolkit-transform-to-pdf/post/params/add-extension" dataTrigger="/alfresco-archive-toolkit/action/archive-toolkit-transform-to-pdf/post/params/add-extension" /> 
+            <RecordValue key="assoc-type" dataExtractor="simpleValue" dataSource="/alfresco-archive-toolkit/action/archive-toolkit-transform-to-pdf/post/params/assoc-type" dataTrigger="/alfresco-archive-toolkit/action/archive-toolkit-transform-to-pdf/post/params/assoc-type" />  
+            <RecordValue key="target-name" dataExtractor="simpleValue" dataSource="/alfresco-archive-toolkit/action/archive-toolkit-transform-to-pdf/post/params/target-name" dataTrigger="/alfresco-archive-toolkit/action/archive-toolkit-transform-to-pdf/post/params/target-name" />  
+            <RecordValue key="destination-folder" dataExtractor="simpleValue" dataSource="/alfresco-archive-toolkit/action/archive-toolkit-transform-to-pdf/post/params/destination-folder" dataTrigger="/alfresco-archive-toolkit/action/archive-toolkit-transform-to-pdf/post/params/destination-folder" />  
+            <RecordValue key="mime-type" dataExtractor="simpleValue" dataSource="/alfresco-archive-toolkit/action/archive-toolkit-transform-to-pdf/post/params/mime-type" dataTrigger="/alfresco-archive-toolkit/action/archive-toolkit-transform-to-pdf/post/params/mime-type" />  
+            <RecordValue key="assoc-name" dataExtractor="simpleValue" dataSource="/alfresco-archive-toolkit/action/archive-toolkit-transform-to-pdf/post/params/assoc-name" dataTrigger="/alfresco-archive-toolkit/action/archive-toolkit-transform-to-pdf/post/params/assoc-name" /> 
+            <RecordValue key="overwrite-copy" dataExtractor="simpleValue" dataSource="/alfresco-archive-toolkit/action/archive-toolkit-transform-to-pdf/post/params/overwrite-copy" dataTrigger="/alfresco-archive-toolkit/action/archive-toolkit-transform-to-pdf/post/params/overwrite-copy" />  
+            <RecordValue key="source-folder" dataExtractor="simpleValue" dataSource="/alfresco-archive-toolkit/action/archive-toolkit-transform-to-pdf/post/params/source-folder" dataTrigger="/alfresco-archive-toolkit/action/archive-toolkit-transform-to-pdf/post/params/source-folder" />   
           </AuditPath>
           <AuditPath key="target">
             <RecordValue key="node" dataExtractor="simpleValue" dataSource="/alfresco-archive-toolkit/action/archive-toolkit-transform-to-pdf/post/target/node" dataTrigger="/alfresco-archive-toolkit/action/archive-toolkit-transform-to-pdf/post/target/node" />  

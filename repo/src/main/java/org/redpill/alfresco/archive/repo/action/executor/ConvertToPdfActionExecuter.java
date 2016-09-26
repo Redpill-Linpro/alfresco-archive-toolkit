@@ -29,6 +29,8 @@ import org.alfresco.repo.action.ParameterDefinitionImpl;
 import org.alfresco.repo.action.executer.ActionExecuterAbstractBase;
 import org.alfresco.repo.audit.AuditComponent;
 import org.alfresco.repo.content.MimetypeMap;
+import org.alfresco.repo.transaction.RetryingTransactionHelper;
+import org.alfresco.repo.transaction.RetryingTransactionHelper.RetryingTransactionCallback;
 
 import org.alfresco.service.cmr.action.Action;
 import org.alfresco.service.cmr.action.ParameterDefinition;
@@ -88,77 +90,16 @@ public class ConvertToPdfActionExecuter extends ActionExecuterAbstractBase imple
   /*
      * Injected services
    */
-  private DictionaryService dictionaryService;
-  private NodeService nodeService;
-  private CheckOutCheckInService checkOutCheckInService;
-  private ContentService contentService;
-  private CopyService copyService;
-  private MimetypeService mimetypeService;
+  protected DictionaryService dictionaryService;
+  protected NodeService nodeService;
+  protected CheckOutCheckInService checkOutCheckInService;
+  protected ContentService contentService;
+  protected CopyService copyService;
+  protected MimetypeService mimetypeService;
   protected AuditComponent auditComponent;
+  protected RetryingTransactionHelper retryingTransactionHelper;
 
-  /**
-   * Sets the audit component
-   *
-   * @param auditComponent
-   */
-  public void setAuditComponent(AuditComponent auditComponent) {
-    this.auditComponent = auditComponent;
-  }
-
-  /**
-   * Set the mime type service
-   *
-   * @param mimetypeService
-   */
-  public void setMimetypeService(MimetypeService mimetypeService) {
-    this.mimetypeService = mimetypeService;
-  }
-
-  /**
-   * Set the node service
-   *
-   * @param nodeService
-   */
-  public void setNodeService(NodeService nodeService) {
-    this.nodeService = nodeService;
-  }
-
-  /**
-   * Set the service to determine check-in and check-out status
-   *
-   * @param checkOutCheckInService
-   */
-  public void setCheckOutCheckInService(CheckOutCheckInService checkOutCheckInService) {
-    this.checkOutCheckInService = checkOutCheckInService;
-  }
-
-  /**
-   * Set the dictionary service
-   *
-   * @param dictionaryService
-   */
-  @Override
-  public void setDictionaryService(DictionaryService dictionaryService) {
-    this.dictionaryService = dictionaryService;
-  }
-
-  /**
-   * Set the content service
-   *
-   * @param contentService
-   */
-  public void setContentService(ContentService contentService) {
-    this.contentService = contentService;
-  }
-
-  /**
-   * Set the copy service
-   *
-   * @param copyService
-   */
-  public void setCopyService(CopyService copyService) {
-    this.copyService = copyService;
-  }
+  
 
   /**
    * Add parameter definitions
@@ -201,19 +142,8 @@ public class ConvertToPdfActionExecuter extends ActionExecuterAbstractBase imple
       String targetName = (String) ruleAction.getParameterValue(PARAM_TARGET_NAME);
       try {
         {
-          Map<String, Serializable> auditValues = new HashMap<>();
-          auditValues.put("/node", actionedUponNodeRef);
-          auditValues.put("/pre/params/" + PARAM_SOURCE_FOLDER, sourceFolder);
-          auditValues.put("/pre/params/" + PARAM_SOURCE_FILENAME, sourceFilename);
-          auditValues.put("/pre/params/" + PARAM_MIME_TYPE, mimeType);
-          auditValues.put("/pre/params/" + PARAM_DESTINATION_FOLDER, destinationParent);
-          auditValues.put("/pre/params/" + PARAM_ASSOC_TYPE_QNAME, destinationAssocTypeQName);
-          auditValues.put("/pre/params/" + PARAM_ASSOC_QNAME, destinationAssocQName);
-          auditValues.put("/pre/params/" + PARAM_OVERWRITE_COPY, overwriteValue);
-          auditValues.put("/pre/params/" + PARAM_ADD_EXTENSION, addExtensionValue);
-          auditValues.put("/pre/params/" + PARAM_TARGET_NAME, targetName);
 
-          auditComponent.recordAuditValues("/" + AUDIT_APPLICATION_NAME + "/action/" + NAME, auditValues);
+          auditPre(actionedUponNodeRef, sourceFolder, sourceFilename, mimeType, destinationParent, destinationAssocTypeQName, destinationAssocQName, overwriteValue, addExtensionValue, targetName);
         }
         if (sourceFolder != null && sourceFilename != null && nodeService.exists(sourceFolder)) {
           List<ChildAssociationRef> childAssocs = nodeService.getChildAssocs(sourceFolder);
@@ -362,49 +292,84 @@ public class ConvertToPdfActionExecuter extends ActionExecuterAbstractBase imple
           LOGGER.trace("Finished transformation to pdf for " + actionedUponNodeRef);
         }
         {
-          Map<String, Serializable> auditValues = new HashMap<>();
-          auditValues.put("/node", actionedUponNodeRef);
-          auditValues.put("/post/params/" + PARAM_SOURCE_FOLDER, sourceFolder);
-          auditValues.put("/post/params/" + PARAM_SOURCE_FILENAME, sourceFilename);
-          auditValues.put("/post/params/" + PARAM_MIME_TYPE, mimeType);
-          auditValues.put("/post/params/" + PARAM_DESTINATION_FOLDER, destinationParent);
-          auditValues.put("/post/params/" + PARAM_ASSOC_TYPE_QNAME, destinationAssocTypeQName);
-          auditValues.put("/post/params/" + PARAM_ASSOC_QNAME, destinationAssocQName);
-          auditValues.put("/post/params/" + PARAM_OVERWRITE_COPY, overwriteValue);
-          auditValues.put("/post/params/" + PARAM_ADD_EXTENSION, addExtensionValue);
-          auditValues.put("/post/params/" + PARAM_TARGET_NAME, targetName);
-          auditValues.put("/post/target/node", copyNodeRef);
-          auditValues.put("/post/target/name", newName);
-
-          auditComponent.recordAuditValues("/" + AUDIT_APPLICATION_NAME + "/action/" + NAME, auditValues);
+          auditPost(actionedUponNodeRef, sourceFolder, sourceFilename, mimeType, destinationParent, destinationAssocTypeQName, destinationAssocQName, overwriteValue, addExtensionValue, targetName, copyNodeRef, newName);
         }
       } catch (Exception e) {
-        Map<String, Serializable> auditValues = new HashMap<>();
-        auditValues.put("/node", actionedUponNodeRef);
-        auditValues.put("/error/message", e.getMessage());
-        Throwable cause = e.getCause();
-        int i = 1;
-        while (cause != null) {
-          auditValues.put("/error/causes/" + i, cause.getMessage());
-          cause = cause.getCause();
-          i++;
-        }
-        auditValues.put("/error/params/" + PARAM_SOURCE_FOLDER, sourceFolder);
-        auditValues.put("/error/params/" + PARAM_SOURCE_FILENAME, sourceFilename);
-        auditValues.put("/error/params/" + PARAM_MIME_TYPE, mimeType);
-        auditValues.put("/error/params/" + PARAM_DESTINATION_FOLDER, destinationParent);
-        auditValues.put("/error/params/" + PARAM_ASSOC_TYPE_QNAME, destinationAssocTypeQName);
-        auditValues.put("/error/params/" + PARAM_ASSOC_QNAME, destinationAssocQName);
-        auditValues.put("/error/params/" + PARAM_OVERWRITE_COPY, overwriteValue);
-        auditValues.put("/error/params/" + PARAM_ADD_EXTENSION, addExtensionValue);
-        auditValues.put("/error/params/" + PARAM_TARGET_NAME, targetName);
-
-        auditComponent.recordAuditValues("/" + AUDIT_APPLICATION_NAME + "/action/" + NAME, auditValues);
+        auditError(e, actionedUponNodeRef, sourceFolder, sourceFilename, mimeType, destinationParent, destinationAssocTypeQName, destinationAssocQName, overwriteValue, addExtensionValue, targetName);
         throw e;
       } finally {
 
       }
     }
+  }
+
+  protected void auditPre(NodeRef actionedUponNodeRef, NodeRef sourceFolder, String sourceFilename, String mimeType, NodeRef destinationParent, QName destinationAssocTypeQName, QName destinationAssocQName, Boolean overwriteValue, Boolean addExtensionValue, String targetName) {
+    Map<String, Serializable> auditValues = new HashMap<>();
+    auditValues.put("/node", actionedUponNodeRef);
+    auditValues.put("/pre/params/" + PARAM_SOURCE_FOLDER, sourceFolder);
+    auditValues.put("/pre/params/" + PARAM_SOURCE_FILENAME, sourceFilename);
+    auditValues.put("/pre/params/" + PARAM_MIME_TYPE, mimeType);
+    auditValues.put("/pre/params/" + PARAM_DESTINATION_FOLDER, destinationParent);
+    auditValues.put("/pre/params/" + PARAM_ASSOC_TYPE_QNAME, destinationAssocTypeQName);
+    auditValues.put("/pre/params/" + PARAM_ASSOC_QNAME, destinationAssocQName);
+    auditValues.put("/pre/params/" + PARAM_OVERWRITE_COPY, overwriteValue);
+    auditValues.put("/pre/params/" + PARAM_ADD_EXTENSION, addExtensionValue);
+    auditValues.put("/pre/params/" + PARAM_TARGET_NAME, targetName);
+
+    audit(auditValues);
+  }
+
+  protected void auditPost(NodeRef actionedUponNodeRef, NodeRef sourceFolder, String sourceFilename, String mimeType, NodeRef destinationParent, QName destinationAssocTypeQName, QName destinationAssocQName, Boolean overwriteValue, Boolean addExtensionValue, String targetName, NodeRef copyNodeRef, String newName) {
+    Map<String, Serializable> auditValues = new HashMap<>();
+    auditValues.put("/node", actionedUponNodeRef);
+    auditValues.put("/post/params/" + PARAM_SOURCE_FOLDER, sourceFolder);
+    auditValues.put("/post/params/" + PARAM_SOURCE_FILENAME, sourceFilename);
+    auditValues.put("/post/params/" + PARAM_MIME_TYPE, mimeType);
+    auditValues.put("/post/params/" + PARAM_DESTINATION_FOLDER, destinationParent);
+    auditValues.put("/post/params/" + PARAM_ASSOC_TYPE_QNAME, destinationAssocTypeQName);
+    auditValues.put("/post/params/" + PARAM_ASSOC_QNAME, destinationAssocQName);
+    auditValues.put("/post/params/" + PARAM_OVERWRITE_COPY, overwriteValue);
+    auditValues.put("/post/params/" + PARAM_ADD_EXTENSION, addExtensionValue);
+    auditValues.put("/post/params/" + PARAM_TARGET_NAME, targetName);
+    auditValues.put("/post/target/node", copyNodeRef);
+    auditValues.put("/post/target/name", newName);
+
+    audit(auditValues);
+  }
+
+  protected void auditError(Exception e, NodeRef actionedUponNodeRef, NodeRef sourceFolder, String sourceFilename, String mimeType, NodeRef destinationParent, QName destinationAssocTypeQName, QName destinationAssocQName, Boolean overwriteValue, Boolean addExtensionValue, String targetName) {
+    Map<String, Serializable> auditValues = new HashMap<>();
+    auditValues.put("/node", actionedUponNodeRef);
+    auditValues.put("/error/message", e.getMessage());
+    Throwable cause = e.getCause();
+    int i = 1;
+    while (cause != null) {
+      auditValues.put("/error/causes/" + i, cause.getMessage());
+      cause = cause.getCause();
+      i++;
+    }
+    auditValues.put("/error/params/" + PARAM_SOURCE_FOLDER, sourceFolder);
+    auditValues.put("/error/params/" + PARAM_SOURCE_FILENAME, sourceFilename);
+    auditValues.put("/error/params/" + PARAM_MIME_TYPE, mimeType);
+    auditValues.put("/error/params/" + PARAM_DESTINATION_FOLDER, destinationParent);
+    auditValues.put("/error/params/" + PARAM_ASSOC_TYPE_QNAME, destinationAssocTypeQName);
+    auditValues.put("/error/params/" + PARAM_ASSOC_QNAME, destinationAssocQName);
+    auditValues.put("/error/params/" + PARAM_OVERWRITE_COPY, overwriteValue);
+    auditValues.put("/error/params/" + PARAM_ADD_EXTENSION, addExtensionValue);
+    auditValues.put("/error/params/" + PARAM_TARGET_NAME, targetName);
+
+    audit(auditValues);
+  }
+
+  protected void audit(final Map<String, Serializable> auditValues) {
+    retryingTransactionHelper.doInTransaction(new RetryingTransactionCallback<Void>() {
+      @Override
+      public Void execute() throws Throwable {
+        auditComponent.recordAuditValues("/" + AUDIT_APPLICATION_NAME + "/action/" + NAME, auditValues);
+        return null;
+      }
+    }, false, true);
+
   }
 
   protected TransformationOptions newTransformationOptions(Action ruleAction, NodeRef sourceNodeRef) {
@@ -498,6 +463,80 @@ public class ConvertToPdfActionExecuter extends ActionExecuterAbstractBase imple
     return potentialExtensionString.length() > 0 && potentialExtensionString.indexOf(' ') == -1;
   }
 
+  
+  /**
+   * Sets the transaction helper
+   * @param retryingTransactionHelper 
+   */
+  public void setRetryingTransactionHelper(RetryingTransactionHelper retryingTransactionHelper) {
+    this.retryingTransactionHelper = retryingTransactionHelper;
+  }
+  
+  /**
+   * Sets the audit component
+   *
+   * @param auditComponent
+   */
+  public void setAuditComponent(AuditComponent auditComponent) {
+    this.auditComponent = auditComponent;
+  }
+
+  /**
+   * Set the mime type service
+   *
+   * @param mimetypeService
+   */
+  public void setMimetypeService(MimetypeService mimetypeService) {
+    this.mimetypeService = mimetypeService;
+  }
+
+  /**
+   * Set the node service
+   *
+   * @param nodeService
+   */
+  public void setNodeService(NodeService nodeService) {
+    this.nodeService = nodeService;
+  }
+
+  /**
+   * Set the service to determine check-in and check-out status
+   *
+   * @param checkOutCheckInService
+   */
+  public void setCheckOutCheckInService(CheckOutCheckInService checkOutCheckInService) {
+    this.checkOutCheckInService = checkOutCheckInService;
+  }
+
+  /**
+   * Set the dictionary service
+   *
+   * @param dictionaryService
+   */
+  @Override
+  public void setDictionaryService(DictionaryService dictionaryService) {
+    this.dictionaryService = dictionaryService;
+  }
+
+  /**
+   * Set the content service
+   *
+   * @param contentService
+   */
+  public void setContentService(ContentService contentService) {
+    this.contentService = contentService;
+  }
+
+  /**
+   * Set the copy service
+   *
+   * @param copyService
+   */
+  public void setCopyService(CopyService copyService) {
+    this.copyService = copyService;
+  }
+  
+
   @Override
   public void afterPropertiesSet() throws Exception {
     Assert.notNull(dictionaryService);
@@ -510,6 +549,7 @@ public class ConvertToPdfActionExecuter extends ActionExecuterAbstractBase imple
     Assert.notNull(dictionaryService);
     Assert.notNull(dictionaryService);
     Assert.notNull(dictionaryService);
+    Assert.notNull(retryingTransactionHelper);
   }
 
 }
