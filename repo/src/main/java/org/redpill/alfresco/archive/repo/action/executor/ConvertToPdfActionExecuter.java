@@ -38,6 +38,7 @@ import org.alfresco.service.cmr.coci.CheckOutCheckInService;
 import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
+import org.alfresco.service.cmr.repository.ContentData;
 import org.alfresco.service.cmr.repository.ContentReader;
 import org.alfresco.service.cmr.repository.ContentService;
 import org.alfresco.service.cmr.repository.ContentWriter;
@@ -267,7 +268,7 @@ public class ConvertToPdfActionExecuter extends ActionExecuterAbstractBase imple
         if (contentReader != null) {
           // get the writer and set it up
           ContentWriter contentWriter = this.contentService.getWriter(copyNodeRef, ContentModel.PROP_CONTENT, true);
-          contentWriter.setMimetype(newMimetype);                        // new mimetype
+          contentWriter.setMimetype(mimeType);                        // new mimetype
           contentWriter.setEncoding(contentReader.getEncoding());     // original encoding
 
           // Try and transform the content - failures are caught and allowed to fail silently.
@@ -285,6 +286,13 @@ public class ConvertToPdfActionExecuter extends ActionExecuterAbstractBase imple
                       + "   action: " + this);
             }
             throw new RuleServiceException(TRANSFORMING_ERROR_MESSAGE + e.getMessage());
+          }
+         
+          //ContentData contentData = contentWriter.getContentData();
+          ContentData contentData = (ContentData) nodeService.getProperty(copyNodeRef, ContentModel.PROP_CONTENT);
+          if (FAKE_MIMETYPE_PDFA.equalsIgnoreCase(contentData.getMimetype())) {
+            ContentData newContentData = ContentData.setMimetype(contentData, MimetypeMap.MIMETYPE_PDF);
+            nodeService.setProperty(copyNodeRef, ContentModel.PROP_CONTENT, newContentData);
           }
         }
 
