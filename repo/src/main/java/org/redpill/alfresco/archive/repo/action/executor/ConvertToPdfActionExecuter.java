@@ -37,6 +37,8 @@ import org.alfresco.service.cmr.action.ParameterDefinition;
 import org.alfresco.service.cmr.coci.CheckOutCheckInService;
 import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
+import org.alfresco.service.cmr.model.FileFolderService;
+import org.alfresco.service.cmr.model.FileInfo;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.ContentData;
 import org.alfresco.service.cmr.repository.ContentReader;
@@ -70,9 +72,9 @@ public class ConvertToPdfActionExecuter extends ActionExecuterAbstractBase imple
   public static final String ERR_OVERWRITE = "Unable to overwrite copy because more than one have been found.";
   private static final String CONTENT_READER_NOT_FOUND_MESSAGE = "Can not find Content Reader for document. Operation can't be performed";
   private static final String TRANSFORMING_ERROR_MESSAGE = "Some error occurred during document transforming. Error message: ";
-
   private static final String TRANSFORMER_NOT_EXISTS_MESSAGE_PATTERN = "Transformer for '%s' source mime type and '%s' target mime type was not found. Operation can't be performed";
-
+  private static final String ERR_SOURCE_NOT_SUBTYPE_OF_CONTENT = "Source node is not subtype of cm:content";
+  private static final String ERR_TARGET_NOT_SUBTYPE_OF_CONTENT = "Target type is not subtype of cm:content";
   public static final String AUDIT_APPLICATION_NAME = "alfresco-archive-toolkit";
 
   /*
@@ -88,6 +90,7 @@ public class ConvertToPdfActionExecuter extends ActionExecuterAbstractBase imple
   public static final String FAKE_MIMETYPE_PDFA = "application/pdfa";
   public static final String PARAM_SOURCE_FOLDER = "source-folder";
   public static final String PARAM_SOURCE_FILENAME = "source-filename";
+  public static final String PARAM_TARGET_TYPE = "target-type";
   /*
      * Injected services
    */
@@ -99,8 +102,7 @@ public class ConvertToPdfActionExecuter extends ActionExecuterAbstractBase imple
   protected MimetypeService mimetypeService;
   protected AuditComponent auditComponent;
   protected RetryingTransactionHelper retryingTransactionHelper;
-
-  
+  protected FileFolderService fileFolderService;
 
   /**
    * Add parameter definitions
@@ -117,6 +119,7 @@ public class ConvertToPdfActionExecuter extends ActionExecuterAbstractBase imple
     //As a fallback we can also look for a node to convert by source folder and filename. If these are supplied they superseed the node ref supplied with the action
     paramList.add(new ParameterDefinitionImpl(PARAM_SOURCE_FOLDER, DataTypeDefinition.NODE_REF, false, getParamDisplayLabel(PARAM_SOURCE_FOLDER)));
     paramList.add(new ParameterDefinitionImpl(PARAM_SOURCE_FILENAME, DataTypeDefinition.TEXT, false, getParamDisplayLabel(PARAM_SOURCE_FILENAME)));
+    paramList.add(new ParameterDefinitionImpl(PARAM_TARGET_TYPE, DataTypeDefinition.QNAME, false, getParamDisplayLabel(PARAM_TARGET_TYPE)));
   }
 
   /**
@@ -141,10 +144,11 @@ public class ConvertToPdfActionExecuter extends ActionExecuterAbstractBase imple
       Boolean overwriteValue = (Boolean) ruleAction.getParameterValue(PARAM_OVERWRITE_COPY);
       Boolean addExtensionValue = (Boolean) ruleAction.getParameterValue(PARAM_ADD_EXTENSION);
       String targetName = (String) ruleAction.getParameterValue(PARAM_TARGET_NAME);
+      QName targetType = (QName) ruleAction.getParameterValue(PARAM_TARGET_TYPE);
       try {
         {
 
-          auditPre(actionedUponNodeRef, sourceFolder, sourceFilename, mimeType, destinationParent, destinationAssocTypeQName, destinationAssocQName, overwriteValue, addExtensionValue, targetName);
+          auditPre(actionedUponNodeRef, sourceFolder, sourceFilename, mimeType, destinationParent, destinationAssocTypeQName, destinationAssocQName, overwriteValue, addExtensionValue, targetName, targetType);
         }
         if (sourceFolder != null && sourceFilename != null && nodeService.exists(sourceFolder)) {
           List<ChildAssociationRef> childAssocs = nodeService.getChildAssocs(sourceFolder);
@@ -164,8 +168,12 @@ public class ConvertToPdfActionExecuter extends ActionExecuterAbstractBase imple
         // First check that the node is a sub-type of content
         QName typeQName = this.nodeService.getType(actionedUponNodeRef);
         if (this.dictionaryService.isSubClass(typeQName, ContentModel.TYPE_CONTENT) == false) {
-          // it is not content, so can't transform
-          return;
+          throw new RuleServiceException(ERR_SOURCE_NOT_SUBTYPE_OF_CONTENT);
+        }
+
+        // First check that the node is a sub-type of content
+        if (targetType != null && this.dictionaryService.isSubClass(targetType, ContentModel.TYPE_CONTENT) == false) {
+          throw new RuleServiceException(ERR_TARGET_NOT_SUBTYPE_OF_CONTENT);
         }
 
         // Get the content reader
@@ -218,92 +226,81 @@ public class ConvertToPdfActionExecuter extends ActionExecuterAbstractBase imple
         }
         String newName = transformName(this.mimetypeService, selectedName, newMimetype, addExtension);
 
+        if (targetType == null) {
+          //Default to content type
+          targetType = ContentModel.TYPE_CONTENT;
+        }
         // Since we are overwriting we need to figure out whether the destination node exists
-        NodeRef copyNodeRef = null;
+        NodeRef destinationNodeRef = null;
         if (overwrite == true) {
-          // Try and find copies of the actioned upon node reference.
-          // Include the parent folder because that's where the copy will be if this action
-          // had done the first copy.
-          PagingResults<CopyService.CopyInfo> copies = copyService.getCopies(
-                  actionedUponNodeRef,
-                  destinationParent,
-                  new PagingRequest(1000));
-          for (CopyService.CopyInfo copyInfo : copies.getPage()) {
-            NodeRef copy = copyInfo.getNodeRef();
-            String copyName = copyInfo.getName();
+          List<ChildAssociationRef> childAssocs = nodeService.getChildAssocs(destinationParent);
+
+          for (ChildAssociationRef child : childAssocs) {
+            NodeRef childNodeRef = child.getChildRef();
+            String childName = (String) nodeService.getProperty(childNodeRef, ContentModel.PROP_NAME);
+
             // We know that it is in the destination parent, but avoid working copies
-            if (checkOutCheckInService.isWorkingCopy(copy)) {
-              // It is a working copy
-              continue;
-            } else if (!newName.equals(copyName)) {
-              // The copy's name is not what this action would have set it to
-              continue;
+            if (checkOutCheckInService.isWorkingCopy(childNodeRef)) {
+              // It is a working copy, skip it              
+            } else if (newName.equals(childName)) {
+              destinationNodeRef = childNodeRef;
+              break;
             }
-            if (copyNodeRef == null) {
-              copyNodeRef = copy;
-            } else {
-              throw new RuleServiceException(ERR_OVERWRITE);
-            }
+
           }
         }
 
-        if (copyNodeRef == null) {
-          // Copy the content node
-          copyNodeRef = this.copyService.copy(
-                  actionedUponNodeRef,
-                  destinationParent,
-                  destinationAssocTypeQName,
-                  QName.createQName(destinationAssocQName.getNamespaceURI(), newName));
-
-          // Adjust the name of the copy
-          nodeService.setProperty(copyNodeRef, ContentModel.PROP_NAME, newName);
+        if (destinationNodeRef == null) {
+          Map<QName, Serializable> properties = new HashMap<>();
+          properties.put(ContentModel.PROP_NAME, newName);
           String originalTitle = (String) nodeService.getProperty(actionedUponNodeRef, ContentModel.PROP_TITLE);
 
           if (originalTitle != null) {
-            nodeService.setProperty(copyNodeRef, ContentModel.PROP_TITLE, originalTitle);
+            properties.put(ContentModel.PROP_TITLE, originalTitle);
           }
+          ChildAssociationRef createNode = nodeService.createNode(destinationParent, destinationAssocTypeQName, destinationAssocQName, targetType, properties);
+          destinationNodeRef = createNode.getChildRef();
+
         }
 
         // Only do the transformation if some content is available
-        if (contentReader != null) {
-          // get the writer and set it up
-          ContentWriter contentWriter = this.contentService.getWriter(copyNodeRef, ContentModel.PROP_CONTENT, true);
-          contentWriter.setMimetype(mimeType);                        // new mimetype
-          contentWriter.setEncoding(contentReader.getEncoding());     // original encoding
+        // get the writer and set it up
+        ContentWriter contentWriter = this.contentService.getWriter(destinationNodeRef, ContentModel.PROP_CONTENT, true);
+        contentWriter.setMimetype(mimeType);                        // new mimetype
+        contentWriter.setEncoding(contentReader.getEncoding());     // original encoding
 
-          // Try and transform the content - failures are caught and allowed to fail silently.
-          // This is unique to this action, and is essentially a broken pattern.
-          // Clients should rather get the exception and then decide to replay with rules/actions turned off or not.
-          // TODO: Check failure patterns for actions.
-          try {
-            doTransform(ruleAction, actionedUponNodeRef, contentReader, copyNodeRef, contentWriter);
-            ruleAction.setParameterValue(PARAM_RESULT, copyNodeRef);
-          } catch (NoTransformerException e) {
-            if (LOGGER.isDebugEnabled()) {
-              LOGGER.debug("No transformer found to execute rule: \n"
-                      + "   reader: " + contentReader + "\n"
-                      + "   writer: " + contentWriter + "\n"
-                      + "   action: " + this);
-            }
-            throw new RuleServiceException(TRANSFORMING_ERROR_MESSAGE + e.getMessage());
+        // Try and transform the content - failures are caught and allowed to fail silently.
+        // This is unique to this action, and is essentially a broken pattern.
+        // Clients should rather get the exception and then decide to replay with rules/actions turned off or not.
+        // TODO: Check failure patterns for actions.
+        try {
+          doTransform(ruleAction, actionedUponNodeRef, contentReader, destinationNodeRef, contentWriter);
+          ruleAction.setParameterValue(PARAM_RESULT, destinationNodeRef);
+        } catch (NoTransformerException e) {
+          if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("No transformer found to execute rule: \n"
+                    + "   reader: " + contentReader + "\n"
+                    + "   writer: " + contentWriter + "\n"
+                    + "   action: " + this);
           }
-         
-          //ContentData contentData = contentWriter.getContentData();
-          ContentData contentData = (ContentData) nodeService.getProperty(copyNodeRef, ContentModel.PROP_CONTENT);
-          if (FAKE_MIMETYPE_PDFA.equalsIgnoreCase(contentData.getMimetype())) {
-            ContentData newContentData = ContentData.setMimetype(contentData, MimetypeMap.MIMETYPE_PDF);
-            nodeService.setProperty(copyNodeRef, ContentModel.PROP_CONTENT, newContentData);
-          }
+          throw new RuleServiceException(TRANSFORMING_ERROR_MESSAGE + e.getMessage());
+        }
+
+        //ContentData contentData = contentWriter.getContentData();
+        ContentData contentData = (ContentData) nodeService.getProperty(destinationNodeRef, ContentModel.PROP_CONTENT);
+        if (FAKE_MIMETYPE_PDFA.equalsIgnoreCase(contentData.getMimetype())) {
+          ContentData newContentData = ContentData.setMimetype(contentData, MimetypeMap.MIMETYPE_PDF);
+          nodeService.setProperty(destinationNodeRef, ContentModel.PROP_CONTENT, newContentData);
         }
 
         if (LOGGER.isTraceEnabled()) {
           LOGGER.trace("Finished transformation to pdf for " + actionedUponNodeRef);
         }
         {
-          auditPost(actionedUponNodeRef, sourceFolder, sourceFilename, mimeType, destinationParent, destinationAssocTypeQName, destinationAssocQName, overwriteValue, addExtensionValue, targetName, copyNodeRef, newName);
+          auditPost(actionedUponNodeRef, sourceFolder, sourceFilename, mimeType, destinationParent, destinationAssocTypeQName, destinationAssocQName, overwriteValue, addExtensionValue, targetName, destinationNodeRef, newName, targetType);
         }
       } catch (Exception e) {
-        auditError(e, actionedUponNodeRef, sourceFolder, sourceFilename, mimeType, destinationParent, destinationAssocTypeQName, destinationAssocQName, overwriteValue, addExtensionValue, targetName);
+        auditError(e, actionedUponNodeRef, sourceFolder, sourceFilename, mimeType, destinationParent, destinationAssocTypeQName, destinationAssocQName, overwriteValue, addExtensionValue, targetName, targetType);
         throw e;
       } finally {
 
@@ -311,7 +308,7 @@ public class ConvertToPdfActionExecuter extends ActionExecuterAbstractBase imple
     }
   }
 
-  protected void auditPre(NodeRef actionedUponNodeRef, NodeRef sourceFolder, String sourceFilename, String mimeType, NodeRef destinationParent, QName destinationAssocTypeQName, QName destinationAssocQName, Boolean overwriteValue, Boolean addExtensionValue, String targetName) {
+  protected void auditPre(NodeRef actionedUponNodeRef, NodeRef sourceFolder, String sourceFilename, String mimeType, NodeRef destinationParent, QName destinationAssocTypeQName, QName destinationAssocQName, Boolean overwriteValue, Boolean addExtensionValue, String targetName, QName targetType) {
     Map<String, Serializable> auditValues = new HashMap<>();
     auditValues.put("/node", actionedUponNodeRef);
     auditValues.put("/pre/params/" + PARAM_SOURCE_FOLDER, sourceFolder);
@@ -323,11 +320,12 @@ public class ConvertToPdfActionExecuter extends ActionExecuterAbstractBase imple
     auditValues.put("/pre/params/" + PARAM_OVERWRITE_COPY, overwriteValue);
     auditValues.put("/pre/params/" + PARAM_ADD_EXTENSION, addExtensionValue);
     auditValues.put("/pre/params/" + PARAM_TARGET_NAME, targetName);
+    auditValues.put("/pre/params/" + PARAM_TARGET_NAME, targetType);
 
     audit(auditValues);
   }
 
-  protected void auditPost(NodeRef actionedUponNodeRef, NodeRef sourceFolder, String sourceFilename, String mimeType, NodeRef destinationParent, QName destinationAssocTypeQName, QName destinationAssocQName, Boolean overwriteValue, Boolean addExtensionValue, String targetName, NodeRef copyNodeRef, String newName) {
+  protected void auditPost(NodeRef actionedUponNodeRef, NodeRef sourceFolder, String sourceFilename, String mimeType, NodeRef destinationParent, QName destinationAssocTypeQName, QName destinationAssocQName, Boolean overwriteValue, Boolean addExtensionValue, String targetName, NodeRef copyNodeRef, String newName, QName targetType) {
     Map<String, Serializable> auditValues = new HashMap<>();
     auditValues.put("/node", actionedUponNodeRef);
     auditValues.put("/post/params/" + PARAM_SOURCE_FOLDER, sourceFolder);
@@ -339,13 +337,14 @@ public class ConvertToPdfActionExecuter extends ActionExecuterAbstractBase imple
     auditValues.put("/post/params/" + PARAM_OVERWRITE_COPY, overwriteValue);
     auditValues.put("/post/params/" + PARAM_ADD_EXTENSION, addExtensionValue);
     auditValues.put("/post/params/" + PARAM_TARGET_NAME, targetName);
+    auditValues.put("/post/params/" + PARAM_TARGET_NAME, targetType);
     auditValues.put("/post/target/node", copyNodeRef);
     auditValues.put("/post/target/name", newName);
 
     audit(auditValues);
   }
 
-  protected void auditError(Exception e, NodeRef actionedUponNodeRef, NodeRef sourceFolder, String sourceFilename, String mimeType, NodeRef destinationParent, QName destinationAssocTypeQName, QName destinationAssocQName, Boolean overwriteValue, Boolean addExtensionValue, String targetName) {
+  protected void auditError(Exception e, NodeRef actionedUponNodeRef, NodeRef sourceFolder, String sourceFilename, String mimeType, NodeRef destinationParent, QName destinationAssocTypeQName, QName destinationAssocQName, Boolean overwriteValue, Boolean addExtensionValue, String targetName, QName targetType) {
     Map<String, Serializable> auditValues = new HashMap<>();
     auditValues.put("/node", actionedUponNodeRef);
     auditValues.put("/error/message", e.getMessage());
@@ -365,7 +364,7 @@ public class ConvertToPdfActionExecuter extends ActionExecuterAbstractBase imple
     auditValues.put("/error/params/" + PARAM_OVERWRITE_COPY, overwriteValue);
     auditValues.put("/error/params/" + PARAM_ADD_EXTENSION, addExtensionValue);
     auditValues.put("/error/params/" + PARAM_TARGET_NAME, targetName);
-
+    auditValues.put("/error/params/" + PARAM_TARGET_NAME, targetType);
     audit(auditValues);
   }
 
@@ -471,15 +470,15 @@ public class ConvertToPdfActionExecuter extends ActionExecuterAbstractBase imple
     return potentialExtensionString.length() > 0 && potentialExtensionString.indexOf(' ') == -1;
   }
 
-  
   /**
    * Sets the transaction helper
-   * @param retryingTransactionHelper 
+   *
+   * @param retryingTransactionHelper
    */
   public void setRetryingTransactionHelper(RetryingTransactionHelper retryingTransactionHelper) {
     this.retryingTransactionHelper = retryingTransactionHelper;
   }
-  
+
   /**
    * Sets the audit component
    *
@@ -543,7 +542,15 @@ public class ConvertToPdfActionExecuter extends ActionExecuterAbstractBase imple
   public void setCopyService(CopyService copyService) {
     this.copyService = copyService;
   }
-  
+
+  /**
+   * Set the file folder service
+   *
+   * @param fileFolderService
+   */
+  public void setFileFolderService(FileFolderService fileFolderService) {
+    this.fileFolderService = fileFolderService;
+  }
 
   @Override
   public void afterPropertiesSet() throws Exception {
@@ -558,6 +565,7 @@ public class ConvertToPdfActionExecuter extends ActionExecuterAbstractBase imple
     Assert.notNull(dictionaryService);
     Assert.notNull(dictionaryService);
     Assert.notNull(retryingTransactionHelper);
+    Assert.notNull(fileFolderService);
   }
 
 }

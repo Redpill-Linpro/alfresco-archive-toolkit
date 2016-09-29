@@ -168,7 +168,8 @@ public class ConvertToPdfActionExecuterIntegrationTest extends AbstractRepoInteg
     action.setParameterValue(ConvertToPdfActionExecuter.PARAM_ASSOC_QNAME, renditionQName);
     action.setParameterValue(ConvertToPdfActionExecuter.PARAM_TARGET_NAME, RENDITION_NAME_PDFA);
     action.setParameterValue(ConvertToPdfActionExecuter.PARAM_ADD_EXTENSION, false);
-    action.setParameterValue(ConvertToPdfActionExecuter.PARAM_OVERWRITE_COPY, false);
+    action.setParameterValue(ConvertToPdfActionExecuter.PARAM_OVERWRITE_COPY, true);
+    action.setParameterValue(ConvertToPdfActionExecuter.PARAM_TARGET_TYPE, ContentModel.TYPE_THUMBNAIL);
 
     actionService.executeAction(action, document);
 
@@ -180,6 +181,7 @@ public class ConvertToPdfActionExecuterIntegrationTest extends AbstractRepoInteg
     assertNotNull(pdfANodeRef);
     //Assert that there is a child node with name pdfa
     assertEquals("pdfa", _nodeService.getProperty(pdfANodeRef, ContentModel.PROP_NAME));
+    assertEquals(ContentModel.TYPE_THUMBNAIL, _nodeService.getType(pdfANodeRef));
     ContentReader reader = _contentService.getReader(pdfANodeRef, ContentModel.PROP_CONTENT);
     Pair<Boolean, String> validatePdfa = validatePdfa(reader);
 
@@ -202,7 +204,7 @@ public class ConvertToPdfActionExecuterIntegrationTest extends AbstractRepoInteg
     action.setParameterValue(ConvertToPdfActionExecuter.PARAM_ASSOC_QNAME, renditionQName);
     action.setParameterValue(ConvertToPdfActionExecuter.PARAM_TARGET_NAME, RENDITION_NAME_PDF);
     action.setParameterValue(ConvertToPdfActionExecuter.PARAM_ADD_EXTENSION, false);
-    action.setParameterValue(ConvertToPdfActionExecuter.PARAM_OVERWRITE_COPY, false);
+    action.setParameterValue(ConvertToPdfActionExecuter.PARAM_OVERWRITE_COPY, true);
 
     actionService.executeAction(action, document);
 
@@ -214,7 +216,8 @@ public class ConvertToPdfActionExecuterIntegrationTest extends AbstractRepoInteg
     assertNotNull(childNodeRef);
     //Assert that there is a child node with name pdfa
     assertEquals(RENDITION_NAME_PDF, _nodeService.getProperty(childNodeRef, ContentModel.PROP_NAME));
-
+    assertEquals(ContentModel.TYPE_CONTENT, _nodeService.getType(childNodeRef));
+    
     action = actionService.createAction(ConvertToPdfActionExecuter.NAME);
     action.setParameterValue(ConvertToPdfActionExecuter.PARAM_MIME_TYPE, ConvertToPdfActionExecuter.FAKE_MIMETYPE_PDFA);
     action.setParameterValue(ConvertToPdfActionExecuter.PARAM_DESTINATION_FOLDER, document);
@@ -223,7 +226,7 @@ public class ConvertToPdfActionExecuterIntegrationTest extends AbstractRepoInteg
     action.setParameterValue(ConvertToPdfActionExecuter.PARAM_ASSOC_QNAME, renditionQName);
     action.setParameterValue(ConvertToPdfActionExecuter.PARAM_TARGET_NAME, RENDITION_NAME_PDFA);
     action.setParameterValue(ConvertToPdfActionExecuter.PARAM_ADD_EXTENSION, false);
-    action.setParameterValue(ConvertToPdfActionExecuter.PARAM_OVERWRITE_COPY, false);
+    action.setParameterValue(ConvertToPdfActionExecuter.PARAM_OVERWRITE_COPY, true);
     action.setParameterValue(ConvertToPdfActionExecuter.PARAM_SOURCE_FILENAME, RENDITION_NAME_PDF);
     action.setParameterValue(ConvertToPdfActionExecuter.PARAM_SOURCE_FOLDER, document);
 
@@ -256,7 +259,7 @@ public class ConvertToPdfActionExecuterIntegrationTest extends AbstractRepoInteg
     QName renditionQName = QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, (String) RENDITION_NAME_PDF);
     action.setParameterValue(ConvertToPdfActionExecuter.PARAM_ASSOC_QNAME, renditionQName);
     action.setParameterValue(ConvertToPdfActionExecuter.PARAM_TARGET_NAME, RENDITION_NAME_PDF);
-    action.setParameterValue(ConvertToPdfActionExecuter.PARAM_ADD_EXTENSION, false);
+    action.setParameterValue(ConvertToPdfActionExecuter.PARAM_ADD_EXTENSION, true);
     action.setParameterValue(ConvertToPdfActionExecuter.PARAM_OVERWRITE_COPY, false);
 
     actionService.executeAction(action, document);

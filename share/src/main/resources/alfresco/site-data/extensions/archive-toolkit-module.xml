@@ -17,7 +17,9 @@
               <param name="assoc-type">rn:rendition</param>
               <param name="assoc-name">cm:pdf</param>
               <param name="target-name">pdf</param>
-              <param name="overwrite-copy">false</param>
+              <param name="overwrite-copy">true</param>
+              <param name="add-extension">false</param>
+              <param name="target-type">cm:thumbnail</param>
               <param name="successMessage">message.archive-toolkit-convert-to-pdf-rendition.success</param>
               <param name="failureMessage">message.archive-toolkit-convert-to-pdf-rendition.failure</param>
               <evaluator>archive-toolkit.evaluator.doclib.action.isAdmin</evaluator>
@@ -30,7 +32,9 @@
               <param name="assoc-type">rn:rendition</param>
               <param name="assoc-name">cm:pdfa</param>
               <param name="target-name">pdfa</param>
-              <param name="overwrite-copy">false</param>
+              <param name="overwrite-copy">true</param>
+              <param name="add-extension">false</param>
+              <param name="target-type">cm:thumbnail</param>
               <param name="successMessage">message.archive-toolkit-convert-to-pdfa-rendition.success</param>
               <param name="failureMessage">message.archive-toolkit-convert-to-pdfa-rendition.failure</param>
               <evaluator>archive-toolkit.evaluator.doclib.action.isAdmin</evaluator>
