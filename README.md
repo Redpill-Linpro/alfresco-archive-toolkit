@@ -44,6 +44,14 @@ Maven repository:
 
 The jar files are also downloadable from: https://maven.redpill-linpro.com/nexus/index.html#nexus-search;quick~alfresco-archive-toolkit
 
+Usage
+-----
+
+Components:
+* An action which can be used to transform content into pdf (x->pdf) & pdf/a (pdf->pdf/a) (TODO Documentation)
+* A web script which will display auditing of the action can be reached at: http://localhost:8080/share/page/archive-toolkit/audit
+* 
+
 
 License
 -------
