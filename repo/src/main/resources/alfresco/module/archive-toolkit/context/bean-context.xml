@@ -21,13 +21,13 @@
         </property>
       </bean>
     </property>
+    
     <property name="transformCommand">
       <bean class="org.alfresco.util.exec.RuntimeExec">
         <property name="commandsAndArguments">
           <map>
             <entry key=".*">
               <list>
-                <!-- http://stackoverflow.com/questions/1659147/how-to-use-ghostscript-to-convert-pdf-to-pdf-a-or-pdf-x gs -dPDFA -dBATCH -dNOPAUSE -sProcessColorModel=DeviceCMYK -sDEVICE=pdfwrite -sPDFACompatibilityPolicy=1 -sOutputFile=protokoll-stamma-signerat-2015-pdf-a.pdf protokoll-stamma-signerat-2015.pdf -->
                 <value>${gs.exe}</value>
                 <value>-dPDFA=1</value>
                 <value>-dSAFER</value>
@@ -40,7 +40,6 @@
                 <value>-sDEVICE=pdfwrite</value>
                 <value>-sPDFACompatibilityPolicy=1</value>
                 <value>-sOutputFile=${target}</value>
-                <!-- <value>${pdfa.definition.file}</value> -->
                 <value>${source}</value>
               </list>
             </entry>
@@ -51,7 +50,34 @@
         </property>
       </bean>
     </property>
-
+     
+<!-- TODO change to this more correct transformation method. Fix path to icc profile in ps-file.
+   
+    <property name="transformCommand">
+      <bean class="org.alfresco.util.exec.RuntimeExec">
+        <property name="commandsAndArguments">
+          <map>
+            <entry key=".*">
+              <list>
+                <value>${gs.exe}</value>
+                <value>-dPDFA</value>
+                <value>-dNOOUTERSAVE</value>
+                <value>-sProcessColorModel=DeviceRGB</value>
+                <value>-sDEVICE=pdfwrite</value>
+                <value>-sPDFACompatibilityPolicy=1</value>
+                <value>-sOutputFile=${target}</value>
+                <value>${pdfa.definition.file}</value>
+                <value>${source}</value>
+              </list>
+            </entry>
+          </map>
+        </property>
+        <property name="errorCodes">
+          <value>1</value>
+        </property>
+      </bean>
+    </property>
+ -->
     <!-- <property name="transformerConfig"> <ref bean="transformerConfig" /> </property> -->
   </bean>
 
