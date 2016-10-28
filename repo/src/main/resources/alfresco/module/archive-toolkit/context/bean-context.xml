@@ -50,7 +50,7 @@
         </property>
       </bean>
     </property>
-     
+      
 <!-- TODO change to this more correct transformation method. Fix path to icc profile in ps-file.
    
     <property name="transformCommand">
