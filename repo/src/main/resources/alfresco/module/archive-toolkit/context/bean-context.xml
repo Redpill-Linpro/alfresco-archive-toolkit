@@ -22,7 +22,7 @@
       </bean>
     </property>
     
-    <property name="transformCommand">
+ <!--    <property name="transformCommand">
       <bean class="org.alfresco.util.exec.RuntimeExec">
         <property name="commandsAndArguments">
           <map>
@@ -49,9 +49,9 @@
           <value>1</value>
         </property>
       </bean>
-    </property>
+    </property>-->
       
-<!-- TODO change to this more correct transformation method. Fix path to icc profile in ps-file.
+<!-- TODO change to this more correct transformation method. Fix path to icc profile in ps-file.-->
    
     <property name="transformCommand">
       <bean class="org.alfresco.util.exec.RuntimeExec">
@@ -60,12 +60,13 @@
             <entry key=".*">
               <list>
                 <value>${gs.exe}</value>
-                <value>-dPDFA</value>
+                <value>-dPDFA=1</value>
                 <value>-dNOOUTERSAVE</value>
                 <value>-sProcessColorModel=DeviceRGB</value>
                 <value>-sDEVICE=pdfwrite</value>
+                <value>-o</value>
+                <value>${target}</value>
                 <value>-sPDFACompatibilityPolicy=1</value>
-                <value>-sOutputFile=${target}</value>
                 <value>${pdfa.definition.file}</value>
                 <value>${source}</value>
               </list>
@@ -77,7 +78,7 @@
         </property>
       </bean>
     </property>
- -->
+ 
     <!-- <property name="transformerConfig"> <ref bean="transformerConfig" /> </property> -->
   </bean>
 
