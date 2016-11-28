@@ -4,7 +4,7 @@ function main()
    var result;
 
    // Call the repo for audit records
-   result = remote.call("/api/audit/query/alfresco-archive-toolkit?verbose=true&limit=100");
+   result = remote.call("/api/audit/query/alfresco-archive-toolkit?verbose=true&limit=100&forward=false");
    if (result.status == 200)
    {
       // Create javascript objects from the server response
