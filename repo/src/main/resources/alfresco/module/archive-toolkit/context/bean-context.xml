@@ -21,8 +21,8 @@
         </property>
       </bean>
     </property>
-    
- <!--    <property name="transformCommand">
+    <!-- 
+     <property name="transformCommand">
       <bean class="org.alfresco.util.exec.RuntimeExec">
         <property name="commandsAndArguments">
           <map>
@@ -49,8 +49,8 @@
           <value>1</value>
         </property>
       </bean>
-    </property>-->
-      
+    </property>
+       -->
 <!-- TODO change to this more correct transformation method. Fix path to icc profile in ps-file.-->
    
     <property name="transformCommand">

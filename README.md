@@ -44,6 +44,23 @@ Maven repository:
 
 The jar files are also downloadable from: https://maven.redpill-linpro.com/nexus/index.html#nexus-search;quick~alfresco-archive-toolkit
 
+Ghostscript and ghostscript resource files
+-------------------------------------------
+ 
+To convert from pdf to pdf/a Ghostscript needs to be installed. Add the path to the ghostscript executable by setting 
+gs.exe=path_to_ghostscript in your alfresco-global.properties file. Ghostscript makes use of a postscript definition file 
+(PDFA_def.ps) and an ICC color profile (sRGB_IEC61966-2.1.icc) which you need to copy from the source files of this 
+project to a runtime path on the server which is then pointed out in the alfresco-global.properties. 
+```
+pdfa.definition.file=/my/path/gs/PDFA_def.ps
+```
+
+The path to the color profile is pointed out inside the postscript definition file.
+```
+/ICCProfile (/my/path/gs/sRGB_IEC61966-2.1.icc)   % Customize.
+```
+
+
 Usage
 -----
 
