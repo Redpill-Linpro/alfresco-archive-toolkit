@@ -1,6 +1,6 @@
 <webscript>
   <shortname>Alfresco Archive Toolkit Audit Log</shortname>
   <description>A script to fetch audit logs</description>
-  <url>/archive-toolkit/audit</url>
+  <url>/archive-toolkit/audit/{filter}</url>
   <family>Alfresco Archive Toolkit</family>
 </webscript>
