@@ -62,7 +62,7 @@ import org.springframework.util.Assert;
  * @author Marcus Svartmark - Redpill Linpro AB
  */
 public class ConvertToPdfActionExecuter extends ActionExecuterAbstractBase implements InitializingBean {
-
+  
   public static final String NAME = "archive-toolkit-transform-to-pdf";
   private final static Log LOGGER = LogFactory.getLog(ConvertToPdfActionExecuter.class);
   /* Error messages */
@@ -88,6 +88,7 @@ public class ConvertToPdfActionExecuter extends ActionExecuterAbstractBase imple
   public static final String PARAM_SOURCE_FOLDER = "source-folder";
   public static final String PARAM_SOURCE_FILENAME = "source-filename";
   public static final String PARAM_TARGET_TYPE = "target-type";
+  public static final String PARAM_TIMEOUT = "timeout";
   /*
      * Injected services
    */
@@ -100,6 +101,7 @@ public class ConvertToPdfActionExecuter extends ActionExecuterAbstractBase imple
   protected AuditComponent auditComponent;
   protected RetryingTransactionHelper retryingTransactionHelper;
   protected FileFolderService fileFolderService;
+  protected final Long DEFAULT_TIMEOUT = 60000L; //Timeout in MS
 
   /**
    * Add parameter definitions
@@ -117,6 +119,7 @@ public class ConvertToPdfActionExecuter extends ActionExecuterAbstractBase imple
     paramList.add(new ParameterDefinitionImpl(PARAM_SOURCE_FOLDER, DataTypeDefinition.NODE_REF, false, getParamDisplayLabel(PARAM_SOURCE_FOLDER)));
     paramList.add(new ParameterDefinitionImpl(PARAM_SOURCE_FILENAME, DataTypeDefinition.TEXT, false, getParamDisplayLabel(PARAM_SOURCE_FILENAME)));
     paramList.add(new ParameterDefinitionImpl(PARAM_TARGET_TYPE, DataTypeDefinition.QNAME, false, getParamDisplayLabel(PARAM_TARGET_TYPE)));
+    paramList.add(new ParameterDefinitionImpl(PARAM_TIMEOUT, DataTypeDefinition.LONG, false, getParamDisplayLabel(PARAM_TIMEOUT)));
   }
 
   /**
@@ -129,9 +132,9 @@ public class ConvertToPdfActionExecuter extends ActionExecuterAbstractBase imple
     if (LOGGER.isTraceEnabled()) {
       LOGGER.trace("Starting transformation to pdf for " + actionedUponNodeRef);
     }
-
+    
     {
-
+      
       NodeRef sourceFolder = (NodeRef) ruleAction.getParameterValue(PARAM_SOURCE_FOLDER);
       String sourceFilename = (String) ruleAction.getParameterValue(PARAM_SOURCE_FILENAME);
       String mimeType = (String) ruleAction.getParameterValue(PARAM_MIME_TYPE);
@@ -142,9 +145,13 @@ public class ConvertToPdfActionExecuter extends ActionExecuterAbstractBase imple
       Boolean addExtensionValue = (Boolean) ruleAction.getParameterValue(PARAM_ADD_EXTENSION);
       String targetName = (String) ruleAction.getParameterValue(PARAM_TARGET_NAME);
       QName targetType = (QName) ruleAction.getParameterValue(PARAM_TARGET_TYPE);
+      Long timeout = (Long) ruleAction.getParameterValue(PARAM_TIMEOUT);
+      if (timeout == null) {
+        timeout = DEFAULT_TIMEOUT;
+      }
       try {
         {
-
+          
           auditPre(actionedUponNodeRef, sourceFolder, sourceFilename, mimeType, destinationParent, destinationAssocTypeQName, destinationAssocQName, overwriteValue, addExtensionValue, targetName, targetType);
         }
         if (sourceFolder != null && sourceFilename != null && nodeService.exists(sourceFolder)) {
@@ -178,11 +185,14 @@ public class ConvertToPdfActionExecuter extends ActionExecuterAbstractBase imple
         if (null == contentReader || !contentReader.exists()) {
           throw new RuleServiceException(CONTENT_READER_NOT_FOUND_MESSAGE);
         }
-
+        
         TransformationOptions options = newTransformationOptions(ruleAction, actionedUponNodeRef);
         // getExecuteAsychronously() is not true for async convert content rules, so using Thread name
         //        options.setUse(ruleAction.getExecuteAsychronously() ? "asyncRule" :"syncRule");
         options.setUse(Thread.currentThread().getName().contains("Async") ? "asyncRule" : "syncRule");
+        //Set a timeout
+        options.setTimeoutMs(timeout);
+        
         if (null == contentService.getTransformer(contentReader.getContentUrl(), contentReader.getMimetype(), contentReader.getSize(), mimeType, options)) {
           throw new RuleServiceException(String.format(TRANSFORMER_NOT_EXISTS_MESSAGE_PATTERN, contentReader.getMimetype(), mimeType));
         }
@@ -197,14 +207,14 @@ public class ConvertToPdfActionExecuter extends ActionExecuterAbstractBase imple
 
         // Get the overwrite value
         boolean overwrite = true;
-
+        
         if (overwriteValue != null) {
           overwrite = overwriteValue.booleanValue();
         }
 
         // Calculate the destination name
         String originalName = (String) nodeService.getProperty(actionedUponNodeRef, ContentModel.PROP_NAME);
-
+        
         String selectedName;
         if (targetName != null) {
           selectedName = targetName;
@@ -217,12 +227,12 @@ public class ConvertToPdfActionExecuter extends ActionExecuterAbstractBase imple
         }
         // Get the overwrite value
         boolean addExtension = true;
-
+        
         if (addExtensionValue != null) {
           addExtension = addExtensionValue.booleanValue();
         }
         String newName = transformName(this.mimetypeService, selectedName, newMimetype, addExtension);
-
+        
         if (targetType == null) {
           //Default to content type
           targetType = ContentModel.TYPE_CONTENT;
@@ -231,7 +241,7 @@ public class ConvertToPdfActionExecuter extends ActionExecuterAbstractBase imple
         NodeRef destinationNodeRef = null;
         if (overwrite == true) {
           List<ChildAssociationRef> childAssocs = nodeService.getChildAssocs(destinationParent);
-
+          
           for (ChildAssociationRef child : childAssocs) {
             NodeRef childNodeRef = child.getChildRef();
             String childName = (String) nodeService.getProperty(childNodeRef, ContentModel.PROP_NAME);
@@ -243,21 +253,21 @@ public class ConvertToPdfActionExecuter extends ActionExecuterAbstractBase imple
               destinationNodeRef = childNodeRef;
               break;
             }
-
+            
           }
         }
-
+        
         if (destinationNodeRef == null) {
           Map<QName, Serializable> properties = new HashMap<>();
           properties.put(ContentModel.PROP_NAME, newName);
           String originalTitle = (String) nodeService.getProperty(actionedUponNodeRef, ContentModel.PROP_TITLE);
-
+          
           if (originalTitle != null) {
             properties.put(ContentModel.PROP_TITLE, originalTitle);
           }
           ChildAssociationRef createNode = nodeService.createNode(destinationParent, destinationAssocTypeQName, destinationAssocQName, targetType, properties);
           destinationNodeRef = createNode.getChildRef();
-
+          
         }
 
         // Only do the transformation if some content is available
@@ -271,7 +281,7 @@ public class ConvertToPdfActionExecuter extends ActionExecuterAbstractBase imple
         // Clients should rather get the exception and then decide to replay with rules/actions turned off or not.
         // TODO: Check failure patterns for actions.
         try {
-          doTransform(ruleAction, actionedUponNodeRef, contentReader, destinationNodeRef, contentWriter);
+          doTransform(ruleAction, actionedUponNodeRef, contentReader, destinationNodeRef, contentWriter, timeout);
           ruleAction.setParameterValue(PARAM_RESULT, destinationNodeRef);
         } catch (NoTransformerException e) {
           if (LOGGER.isDebugEnabled()) {
@@ -289,7 +299,7 @@ public class ConvertToPdfActionExecuter extends ActionExecuterAbstractBase imple
           ContentData newContentData = ContentData.setMimetype(contentData, MimetypeMap.MIMETYPE_PDF);
           nodeService.setProperty(destinationNodeRef, ContentModel.PROP_CONTENT, newContentData);
         }
-
+        
         if (LOGGER.isTraceEnabled()) {
           LOGGER.trace("Finished transformation to pdf for " + actionedUponNodeRef);
         }
@@ -300,11 +310,11 @@ public class ConvertToPdfActionExecuter extends ActionExecuterAbstractBase imple
         auditError(e, actionedUponNodeRef, sourceFolder, sourceFilename, mimeType, destinationParent, destinationAssocTypeQName, destinationAssocQName, overwriteValue, addExtensionValue, targetName, targetType);
         throw e;
       } finally {
-
+        
       }
     }
   }
-
+  
   protected void auditPre(NodeRef actionedUponNodeRef, NodeRef sourceFolder, String sourceFilename, String mimeType, NodeRef destinationParent, QName destinationAssocTypeQName, QName destinationAssocQName, Boolean overwriteValue, Boolean addExtensionValue, String targetName, QName targetType) {
     Map<String, Serializable> auditValues = new HashMap<>();
     auditValues.put("/node", actionedUponNodeRef);
@@ -318,10 +328,10 @@ public class ConvertToPdfActionExecuter extends ActionExecuterAbstractBase imple
     auditValues.put("/pre/params/" + PARAM_ADD_EXTENSION, addExtensionValue);
     auditValues.put("/pre/params/" + PARAM_TARGET_NAME, targetName);
     auditValues.put("/pre/params/" + PARAM_TARGET_NAME, targetType);
-
+    
     audit(auditValues);
   }
-
+  
   protected void auditPost(NodeRef actionedUponNodeRef, NodeRef sourceFolder, String sourceFilename, String mimeType, NodeRef destinationParent, QName destinationAssocTypeQName, QName destinationAssocQName, Boolean overwriteValue, Boolean addExtensionValue, String targetName, NodeRef copyNodeRef, String newName, QName targetType) {
     Map<String, Serializable> auditValues = new HashMap<>();
     auditValues.put("/node", actionedUponNodeRef);
@@ -337,10 +347,10 @@ public class ConvertToPdfActionExecuter extends ActionExecuterAbstractBase imple
     auditValues.put("/post/params/" + PARAM_TARGET_NAME, targetType);
     auditValues.put("/post/target/node", copyNodeRef);
     auditValues.put("/post/target/name", newName);
-
+    
     audit(auditValues);
   }
-
+  
   protected void auditError(Exception e, NodeRef actionedUponNodeRef, NodeRef sourceFolder, String sourceFilename, String mimeType, NodeRef destinationParent, QName destinationAssocTypeQName, QName destinationAssocQName, Boolean overwriteValue, Boolean addExtensionValue, String targetName, QName targetType) {
     Map<String, Serializable> auditValues = new HashMap<>();
     auditValues.put("/node", actionedUponNodeRef);
@@ -364,7 +374,7 @@ public class ConvertToPdfActionExecuter extends ActionExecuterAbstractBase imple
     auditValues.put("/error/params/" + PARAM_TARGET_NAME, targetType);
     audit(auditValues);
   }
-
+  
   protected void audit(final Map<String, Serializable> auditValues) {
     retryingTransactionHelper.doInTransaction(new RetryingTransactionCallback<Void>() {
       @Override
@@ -373,9 +383,9 @@ public class ConvertToPdfActionExecuter extends ActionExecuterAbstractBase imple
         return null;
       }
     }, false, true);
-
+    
   }
-
+  
   protected TransformationOptions newTransformationOptions(Action ruleAction, NodeRef sourceNodeRef) {
     return new TransformationOptions(sourceNodeRef, ContentModel.PROP_NAME, null, ContentModel.PROP_NAME);
   }
@@ -383,12 +393,20 @@ public class ConvertToPdfActionExecuter extends ActionExecuterAbstractBase imple
   /**
    * Executed in a new transaction so that failures don't cause the entire
    * transaction to rollback.
+   *
+   * @param ruleAction the action
+   * @param sourceNodeRef the source node
+   * @param contentReader the source reader
+   * @param destinationNodeRef the destination node
+   * @param contentWriter the destination reader
+   * @param timeout timeout in ms for the transformation
    */
   protected void doTransform(Action ruleAction,
           NodeRef sourceNodeRef, ContentReader contentReader,
-          NodeRef destinationNodeRef, ContentWriter contentWriter) {
+          NodeRef destinationNodeRef, ContentWriter contentWriter, Long timeout) {
     // transform - will throw NoTransformerException if there are no transformers
     TransformationOptions options = newTransformationOptions(ruleAction, sourceNodeRef);
+    options.setTimeoutMs(timeout);
     options.setTargetNodeRef(destinationNodeRef);
     this.contentService.transform(contentReader, contentWriter, options);
   }
@@ -439,7 +457,7 @@ public class ConvertToPdfActionExecuter extends ActionExecuterAbstractBase imple
     } else {
       // no extension so don't add a new one
       sb.append(original);
-
+      
       if (alwaysAdd == true) {
         // add the new extension - defaults to .bin
         String newExtension = mimetypeService.getExtension(newMimetype);
@@ -548,7 +566,7 @@ public class ConvertToPdfActionExecuter extends ActionExecuterAbstractBase imple
   public void setFileFolderService(FileFolderService fileFolderService) {
     this.fileFolderService = fileFolderService;
   }
-
+  
   @Override
   public void afterPropertiesSet() throws Exception {
     Assert.notNull(dictionaryService);
@@ -564,5 +582,5 @@ public class ConvertToPdfActionExecuter extends ActionExecuterAbstractBase imple
     Assert.notNull(retryingTransactionHelper);
     Assert.notNull(fileFolderService);
   }
-
+  
 }
