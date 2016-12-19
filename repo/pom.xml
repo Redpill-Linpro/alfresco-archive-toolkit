@@ -125,6 +125,7 @@
             <include>**/*.properties</include>
             <include>**/*.ftl</include>
             <include>**/*.ps</include>
+            <include>**/*.ps</include>
             <include>**/*.icc</include>
           </includes>
         </configuration>

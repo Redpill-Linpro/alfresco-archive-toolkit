@@ -80,6 +80,9 @@
     </property>
  
     <!-- <property name="transformerConfig"> <ref bean="transformerConfig" /> </property> -->
+    
+    <property name="pdfaDefinitionFile" value="${pdfa.definition.file}" />
+    <property name="pdfaICCProfileFile" value="${pdfa.iccprofile.file}" />
   </bean>
 
   <bean id="transformer.Pdf2Pdfa" class="org.alfresco.repo.content.transform.ProxyContentTransformer" parent="baseContentTransformer">
