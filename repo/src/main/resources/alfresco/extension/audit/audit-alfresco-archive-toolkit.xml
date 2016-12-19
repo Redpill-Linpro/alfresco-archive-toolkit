@@ -41,6 +41,7 @@
             <RecordValue key="overwrite-copy" dataExtractor="simpleValue" dataSource="/alfresco-archive-toolkit/action/archive-toolkit-transform-to-pdf/pre/params/overwrite-copy" dataTrigger="/alfresco-archive-toolkit/action/archive-toolkit-transform-to-pdf/pre/params/overwrite-copy" />  
             <RecordValue key="source-folder" dataExtractor="simpleValue" dataSource="/alfresco-archive-toolkit/action/archive-toolkit-transform-to-pdf/pre/params/source-folder" dataTrigger="/alfresco-archive-toolkit/action/archive-toolkit-transform-to-pdf/pre/params/source-folder" />  
             <RecordValue key="target-type" dataExtractor="simpleValue" dataSource="/alfresco-archive-toolkit/action/archive-toolkit-transform-to-pdf/pre/params/target-type" dataTrigger="/alfresco-archive-toolkit/action/archive-toolkit-transform-to-pdf/pre/params/target-type" />  
+            <RecordValue key="timeout" dataExtractor="simpleValue" dataSource="/alfresco-archive-toolkit/action/archive-toolkit-transform-to-pdf/pre/params/timeout" dataTrigger="/alfresco-archive-toolkit/action/archive-toolkit-transform-to-pdf/pre/params/timeout" />  
           </AuditPath>
         </AuditPath>
         
@@ -69,6 +70,7 @@
             <RecordValue key="overwrite-copy" dataExtractor="simpleValue" dataSource="/alfresco-archive-toolkit/action/archive-toolkit-transform-to-pdf/error/params/overwrite-copy" dataTrigger="/alfresco-archive-toolkit/action/archive-toolkit-transform-to-pdf/error/params/overwrite-copy" />  
             <RecordValue key="source-folder" dataExtractor="simpleValue" dataSource="/alfresco-archive-toolkit/action/archive-toolkit-transform-to-pdf/error/params/source-folder" dataTrigger="/alfresco-archive-toolkit/action/archive-toolkit-transform-to-pdf/error/params/source-folder" />  
             <RecordValue key="target-type" dataExtractor="simpleValue" dataSource="/alfresco-archive-toolkit/action/archive-toolkit-transform-to-pdf/error/params/target-type" dataTrigger="/alfresco-archive-toolkit/action/archive-toolkit-transform-to-pdf/error/params/target-type" />  
+            <RecordValue key="timeout" dataExtractor="simpleValue" dataSource="/alfresco-archive-toolkit/action/archive-toolkit-transform-to-pdf/error/params/timeout" dataTrigger="/alfresco-archive-toolkit/action/archive-toolkit-transform-to-pdf/error/params/timeout" />  
           
           </AuditPath>
         </AuditPath>
@@ -85,6 +87,7 @@
             <RecordValue key="overwrite-copy" dataExtractor="simpleValue" dataSource="/alfresco-archive-toolkit/action/archive-toolkit-transform-to-pdf/post/params/overwrite-copy" dataTrigger="/alfresco-archive-toolkit/action/archive-toolkit-transform-to-pdf/post/params/overwrite-copy" />  
             <RecordValue key="source-folder" dataExtractor="simpleValue" dataSource="/alfresco-archive-toolkit/action/archive-toolkit-transform-to-pdf/post/params/source-folder" dataTrigger="/alfresco-archive-toolkit/action/archive-toolkit-transform-to-pdf/post/params/source-folder" />   
             <RecordValue key="target-type" dataExtractor="simpleValue" dataSource="/alfresco-archive-toolkit/action/archive-toolkit-transform-to-pdf/post/params/target-type" dataTrigger="/alfresco-archive-toolkit/action/archive-toolkit-transform-to-pdf/post/params/target-type" />  
+            <RecordValue key="timeout" dataExtractor="simpleValue" dataSource="/alfresco-archive-toolkit/action/archive-toolkit-transform-to-pdf/post/params/timeout" dataTrigger="/alfresco-archive-toolkit/action/archive-toolkit-transform-to-pdf/post/params/timeout" /> 
           </AuditPath>
           <AuditPath key="target">
             <RecordValue key="node" dataExtractor="simpleValue" dataSource="/alfresco-archive-toolkit/action/archive-toolkit-transform-to-pdf/post/target/node" dataTrigger="/alfresco-archive-toolkit/action/archive-toolkit-transform-to-pdf/post/target/node" />  

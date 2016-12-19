@@ -153,7 +153,7 @@ public class ConvertToPdfActionExecuter extends ActionExecuterAbstractBase imple
       try {
         {
 
-          auditPre(actionedUponNodeRef, sourceFolder, sourceFilename, mimeType, destinationParent, destinationAssocTypeQName, destinationAssocQName, overwriteValue, addExtensionValue, targetName, targetType);
+          auditPre(actionedUponNodeRef, sourceFolder, sourceFilename, mimeType, destinationParent, destinationAssocTypeQName, destinationAssocQName, overwriteValue, addExtensionValue, targetName, targetType, timeout);
         }
         if (sourceFolder != null && sourceFilename != null && nodeService.exists(sourceFolder)) {
           List<ChildAssociationRef> childAssocs = nodeService.getChildAssocs(sourceFolder);
@@ -305,10 +305,10 @@ public class ConvertToPdfActionExecuter extends ActionExecuterAbstractBase imple
           LOGGER.trace("Finished transformation to pdf for " + actionedUponNodeRef);
         }
         {
-          auditPost(actionedUponNodeRef, sourceFolder, sourceFilename, mimeType, destinationParent, destinationAssocTypeQName, destinationAssocQName, overwriteValue, addExtensionValue, targetName, destinationNodeRef, newName, targetType);
+          auditPost(actionedUponNodeRef, sourceFolder, sourceFilename, mimeType, destinationParent, destinationAssocTypeQName, destinationAssocQName, overwriteValue, addExtensionValue, targetName, destinationNodeRef, newName, targetType, timeout);
         }
       } catch (Exception e) {
-        auditError(e, actionedUponNodeRef, sourceFolder, sourceFilename, mimeType, destinationParent, destinationAssocTypeQName, destinationAssocQName, overwriteValue, addExtensionValue, targetName, targetType);
+        auditError(e, actionedUponNodeRef, sourceFolder, sourceFilename, mimeType, destinationParent, destinationAssocTypeQName, destinationAssocQName, overwriteValue, addExtensionValue, targetName, targetType, timeout);
         throw e;
       } finally {
 
@@ -316,7 +316,7 @@ public class ConvertToPdfActionExecuter extends ActionExecuterAbstractBase imple
     }
   }
 
-  protected void auditPre(NodeRef actionedUponNodeRef, NodeRef sourceFolder, String sourceFilename, String mimeType, NodeRef destinationParent, QName destinationAssocTypeQName, QName destinationAssocQName, Boolean overwriteValue, Boolean addExtensionValue, String targetName, QName targetType) {
+  protected void auditPre(NodeRef actionedUponNodeRef, NodeRef sourceFolder, String sourceFilename, String mimeType, NodeRef destinationParent, QName destinationAssocTypeQName, QName destinationAssocQName, Boolean overwriteValue, Boolean addExtensionValue, String targetName, QName targetType, Long timeout) {
     Map<String, Serializable> auditValues = new HashMap<>();
     auditValues.put("/node", actionedUponNodeRef);
     auditValues.put("/pre/params/" + PARAM_SOURCE_FOLDER, sourceFolder);
@@ -328,12 +328,12 @@ public class ConvertToPdfActionExecuter extends ActionExecuterAbstractBase imple
     auditValues.put("/pre/params/" + PARAM_OVERWRITE_COPY, overwriteValue);
     auditValues.put("/pre/params/" + PARAM_ADD_EXTENSION, addExtensionValue);
     auditValues.put("/pre/params/" + PARAM_TARGET_NAME, targetName);
-    auditValues.put("/pre/params/" + PARAM_TARGET_NAME, targetType);
-
+    auditValues.put("/pre/params/" + PARAM_TARGET_TYPE, targetType);
+    auditValues.put("/pre/params/" + PARAM_TIMEOUT, timeout);
     audit(auditValues);
   }
 
-  protected void auditPost(NodeRef actionedUponNodeRef, NodeRef sourceFolder, String sourceFilename, String mimeType, NodeRef destinationParent, QName destinationAssocTypeQName, QName destinationAssocQName, Boolean overwriteValue, Boolean addExtensionValue, String targetName, NodeRef copyNodeRef, String newName, QName targetType) {
+  protected void auditPost(NodeRef actionedUponNodeRef, NodeRef sourceFolder, String sourceFilename, String mimeType, NodeRef destinationParent, QName destinationAssocTypeQName, QName destinationAssocQName, Boolean overwriteValue, Boolean addExtensionValue, String targetName, NodeRef copyNodeRef, String newName, QName targetType, Long timeout) {
     Map<String, Serializable> auditValues = new HashMap<>();
     auditValues.put("/node", actionedUponNodeRef);
     auditValues.put("/post/params/" + PARAM_SOURCE_FOLDER, sourceFolder);
@@ -345,14 +345,15 @@ public class ConvertToPdfActionExecuter extends ActionExecuterAbstractBase imple
     auditValues.put("/post/params/" + PARAM_OVERWRITE_COPY, overwriteValue);
     auditValues.put("/post/params/" + PARAM_ADD_EXTENSION, addExtensionValue);
     auditValues.put("/post/params/" + PARAM_TARGET_NAME, targetName);
-    auditValues.put("/post/params/" + PARAM_TARGET_NAME, targetType);
+    auditValues.put("/post/params/" + PARAM_TARGET_TYPE, targetType);
+    auditValues.put("/post/params/" + PARAM_TIMEOUT, timeout);
     auditValues.put("/post/target/node", copyNodeRef);
     auditValues.put("/post/target/name", newName);
 
     audit(auditValues);
   }
 
-  protected void auditError(Exception e, NodeRef actionedUponNodeRef, NodeRef sourceFolder, String sourceFilename, String mimeType, NodeRef destinationParent, QName destinationAssocTypeQName, QName destinationAssocQName, Boolean overwriteValue, Boolean addExtensionValue, String targetName, QName targetType) {
+  protected void auditError(Exception e, NodeRef actionedUponNodeRef, NodeRef sourceFolder, String sourceFilename, String mimeType, NodeRef destinationParent, QName destinationAssocTypeQName, QName destinationAssocQName, Boolean overwriteValue, Boolean addExtensionValue, String targetName, QName targetType, Long timeout) {
     Map<String, Serializable> auditValues = new HashMap<>();
     auditValues.put("/node", actionedUponNodeRef);
     auditValues.put("/error/message", e.getMessage());
@@ -372,7 +373,8 @@ public class ConvertToPdfActionExecuter extends ActionExecuterAbstractBase imple
     auditValues.put("/error/params/" + PARAM_OVERWRITE_COPY, overwriteValue);
     auditValues.put("/error/params/" + PARAM_ADD_EXTENSION, addExtensionValue);
     auditValues.put("/error/params/" + PARAM_TARGET_NAME, targetName);
-    auditValues.put("/error/params/" + PARAM_TARGET_NAME, targetType);
+    auditValues.put("/error/params/" + PARAM_TARGET_TYPE, targetType);
+    auditValues.put("/post/params/" + PARAM_TIMEOUT, timeout);
     audit(auditValues);
   }
 
