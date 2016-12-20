@@ -95,6 +95,7 @@
         <includes>
           <include>**/*.ftl</include>
           <include>**/*.icc</include>
+          <include>**/alfresco-global.properties</include>
         </includes>
         <filtering>false</filtering>
       </resource>
