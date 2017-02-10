@@ -1,5 +1,21 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+
+  <!-- Registration of new model -->
+  <bean id="rl.archiveToolkitDictionaryBootstrap" parent="dictionaryModelBootstrap" depends-on="dictionaryBootstrap">
+    <property name="models">
+      <list>
+        <value>alfresco/module/archive-toolkit/model/archiveToolkitModel.xml</value>
+      </list>
+    </property>
+  </bean>
+  
+  <bean id="rl.archiveToolkitService" class="org.redpill.alfresco.archive.repo.service.ArchiveToolkitServiceImpl">
+    <property name="checksumAlgorithm" value="${archiveToolkit.checksum.algorithm}"/>
+    <property name="nodeService" ref="NodeService" />
+    <property name="contentService" ref="ContentService" />
+  </bean>
+  
   <bean id="transformer.worker.Pdf2Pdfa" class="org.redpill.alfresco.archive.repo.content.transform.PdfToPdfaContentTransformerWorker">
     <property name="mimetypeService">
       <ref bean="mimetypeService" />
@@ -106,6 +122,7 @@
         <value>{http://www.alfresco.org/model/content/1.0}content</value>
       </list>
     </property>
+    <property name="archiveToolkitService" ref="rl.archiveToolkitService" />
   </bean>
 
 </beans>

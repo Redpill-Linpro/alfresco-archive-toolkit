@@ -52,6 +52,7 @@ import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.redpill.alfresco.archive.repo.service.ArchiveToolkitService;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
 
@@ -103,6 +104,7 @@ public class ConvertToPdfActionExecuter extends ActionExecuterAbstractBase imple
   protected AuditComponent auditComponent;
   protected RetryingTransactionHelper retryingTransactionHelper;
   protected FileFolderService fileFolderService;
+  protected ArchiveToolkitService archiveToolkitService;
 
   /**
    * Add parameter definitions
@@ -302,8 +304,16 @@ public class ConvertToPdfActionExecuter extends ActionExecuterAbstractBase imple
         }
 
         if (LOGGER.isTraceEnabled()) {
-          LOGGER.trace("Finished transformation to pdf for " + actionedUponNodeRef);
+          LOGGER.trace("Finished transformation to pdf for " + actionedUponNodeRef + " adding checksum calculation to node.");
         }
+        
+        try {
+          archiveToolkitService.addChecksum(destinationNodeRef);
+        }catch (Exception e){
+          // A failed checksum should not rollback everything, just log it
+          LOGGER.warn("Failed to set checksum on nodeRef: " + destinationNodeRef);
+        }
+        
         {
           auditPost(actionedUponNodeRef, sourceFolder, sourceFilename, mimeType, destinationParent, destinationAssocTypeQName, destinationAssocQName, overwriteValue, addExtensionValue, targetName, destinationNodeRef, newName, targetType, timeout);
         }
@@ -569,6 +579,10 @@ public class ConvertToPdfActionExecuter extends ActionExecuterAbstractBase imple
   public void setFileFolderService(FileFolderService fileFolderService) {
     this.fileFolderService = fileFolderService;
   }
+  
+  public void setArchiveToolkitService(ArchiveToolkitService archiveToolkitService) {
+    this.archiveToolkitService = archiveToolkitService;
+  }
 
   @Override
   public void afterPropertiesSet() throws Exception {
@@ -584,6 +598,7 @@ public class ConvertToPdfActionExecuter extends ActionExecuterAbstractBase imple
     Assert.notNull(dictionaryService);
     Assert.notNull(retryingTransactionHelper);
     Assert.notNull(fileFolderService);
+    Assert.notNull(archiveToolkitService);
   }
 
 }

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<model name="rlat:archiveToolkitModel" xmlns="http://www.alfresco.org/model/dictionary/1.0">
+
+  <description>RL Alfresco Archive Toolkit Data Model</description>
+  <author>Redpill Linpro AB</author>
+  <version>1.0.0</version>
+
+  <imports>
+    <import uri="http://www.alfresco.org/model/system/1.0" prefix="sys" />
+    <import uri="http://www.alfresco.org/model/dictionary/1.0" prefix="d" />
+    <import uri="http://www.alfresco.org/model/content/1.0" prefix="cm" />
+    <import uri="http://www.alfresco.org/model/rendition/1.0" prefix="rn" />
+    <import uri="http://www.alfresco.org/model/datalist/1.0" prefix="dl" />
+    <import uri="http://www.alfresco.org/model/site/1.0" prefix="st" />
+  </imports>
+
+  <namespaces>
+    <namespace uri="http://www.redpill-linpro.com/model/at/1.0" prefix="rlat" />
+  </namespaces>
+  
+<aspects>
+  <aspect name="rlat:checksummed">
+      <title>Checksummed</title>
+      <properties>
+        <property name="rlat:checksum">
+          <title>Checksum</title>
+          <type>d:text</type>
+        </property>
+      </properties>
+    </aspect>
+</aspects>
+  
+
+ 
+</model>
