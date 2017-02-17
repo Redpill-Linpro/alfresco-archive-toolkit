@@ -89,7 +89,6 @@ public class ConvertToPdfActionExecuter extends ActionExecuterAbstractBase imple
   public static final String PARAM_SOURCE_FOLDER = "source-folder";
   public static final String PARAM_SOURCE_FILENAME = "source-filename";
   public static final String PARAM_TARGET_TYPE = "target-type";
-  public static final String PARAM_TARGET_CONTENT_PROPERTY = "target-content-property";
   public static final String PARAM_TIMEOUT = "timeout";
   public static final Long DEFAULT_TIMEOUT = 60000L; //Timeout in MS
   public static final String AUDIT_APPLICATION_NAME = "alfresco-archive-toolkit";
@@ -123,7 +122,6 @@ public class ConvertToPdfActionExecuter extends ActionExecuterAbstractBase imple
     paramList.add(new ParameterDefinitionImpl(PARAM_SOURCE_FOLDER, DataTypeDefinition.NODE_REF, false, getParamDisplayLabel(PARAM_SOURCE_FOLDER)));
     paramList.add(new ParameterDefinitionImpl(PARAM_SOURCE_FILENAME, DataTypeDefinition.TEXT, false, getParamDisplayLabel(PARAM_SOURCE_FILENAME)));
     paramList.add(new ParameterDefinitionImpl(PARAM_TARGET_TYPE, DataTypeDefinition.QNAME, false, getParamDisplayLabel(PARAM_TARGET_TYPE)));
-    paramList.add(new ParameterDefinitionImpl(PARAM_TARGET_CONTENT_PROPERTY, DataTypeDefinition.QNAME, false, getParamDisplayLabel(PARAM_TARGET_CONTENT_PROPERTY)));
     paramList.add(new ParameterDefinitionImpl(PARAM_TIMEOUT, DataTypeDefinition.LONG, false, getParamDisplayLabel(PARAM_TIMEOUT)));
   }
 
@@ -150,10 +148,7 @@ public class ConvertToPdfActionExecuter extends ActionExecuterAbstractBase imple
       Boolean addExtensionValue = (Boolean) ruleAction.getParameterValue(PARAM_ADD_EXTENSION);
       String targetName = (String) ruleAction.getParameterValue(PARAM_TARGET_NAME);
       QName targetType = (QName) ruleAction.getParameterValue(PARAM_TARGET_TYPE);
-      QName targetContentProperty = (QName) ruleAction.getParameterValue(PARAM_TARGET_CONTENT_PROPERTY);
-      if (targetContentProperty == null){
-        targetContentProperty = ContentModel.PROP_CONTENT;
-      }
+      
       Long timeout = (Long) ruleAction.getParameterValue(PARAM_TIMEOUT);
       if (timeout == null) {
         timeout = DEFAULT_TIMEOUT;
@@ -198,7 +193,6 @@ public class ConvertToPdfActionExecuter extends ActionExecuterAbstractBase imple
         TransformationOptions options = newTransformationOptions(ruleAction, actionedUponNodeRef);
         // getExecuteAsychronously() is not true for async convert content rules, so using Thread name
         //        options.setUse(ruleAction.getExecuteAsychronously() ? "asyncRule" :"syncRule");
-        options.setTargetContentProperty(targetContentProperty);
         options.setUse(Thread.currentThread().getName().contains("Async") ? "asyncRule" : "syncRule");
         //Set a timeout
         options.setTimeoutMs(timeout);
@@ -308,6 +302,12 @@ public class ConvertToPdfActionExecuter extends ActionExecuterAbstractBase imple
         if (FAKE_MIMETYPE_PDFA.equalsIgnoreCase(contentData.getMimetype())) {
           ContentData newContentData = ContentData.setMimetype(contentData, MimetypeMap.MIMETYPE_PDF);
           nodeService.setProperty(destinationNodeRef, ContentModel.PROP_CONTENT, newContentData);
+        }
+        
+        // To avoid thumbnail node node beeing marked as incomplete, we need to add the targetContentProperty
+        // FIXME this should be done in a more generic way, but I can't find out how it is intended now. 
+        if (ContentModel.TYPE_THUMBNAIL.equals(nodeService.getType(destinationNodeRef))){
+          nodeService.setProperty(destinationNodeRef, ContentModel.PROP_CONTENT_PROPERTY_NAME, ContentModel.PROP_CONTENT);
         }
 
         if (LOGGER.isTraceEnabled()) {
