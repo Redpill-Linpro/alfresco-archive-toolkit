@@ -194,7 +194,11 @@ public class ConvertToPdfActionExecuter extends ActionExecuterAbstractBase imple
         // getExecuteAsychronously() is not true for async convert content rules, so using Thread name
         //        options.setUse(ruleAction.getExecuteAsychronously() ? "asyncRule" :"syncRule");
         options.setUse(Thread.currentThread().getName().contains("Async") ? "asyncRule" : "syncRule");
+
         //Set a timeout
+        if (LOGGER.isTraceEnabled()) {
+          LOGGER.trace("Settting timeout to " + timeout);
+        }
         options.setTimeoutMs(timeout);
 
         if (null == contentService.getTransformer(contentReader.getContentUrl(), contentReader.getMimetype(), contentReader.getSize(), mimeType, options)) {
@@ -285,7 +289,15 @@ public class ConvertToPdfActionExecuter extends ActionExecuterAbstractBase imple
         // Clients should rather get the exception and then decide to replay with rules/actions turned off or not.
         // TODO: Check failure patterns for actions.
         try {
+          //Set a timeout
+          if (LOGGER.isTraceEnabled()) {
+            LOGGER.trace("Calling transformation for: " + actionedUponNodeRef + " timeout set to " + timeout);
+          }
           doTransform(ruleAction, actionedUponNodeRef, contentReader, destinationNodeRef, contentWriter, timeout);
+          
+          if (LOGGER.isTraceEnabled()) {
+            LOGGER.trace("Transformation done to destination nodeRef: " + destinationNodeRef + " setting content property.");
+          }
           ruleAction.setParameterValue(PARAM_RESULT, destinationNodeRef);
         } catch (NoTransformerException e) {
           if (LOGGER.isDebugEnabled()) {
