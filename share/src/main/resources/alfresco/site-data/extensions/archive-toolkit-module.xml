@@ -1,0 +1,56 @@
+<extension>
+  <modules>
+    <module>
+      <id>Archive Toolkit - Create PDF Rendition Action</id>
+      <auto-deploy>false</auto-deploy>
+      <version>${project.version}</version>
+
+      <configurations>
+
+        <config evaluator="string-compare" condition="DocLibActions">
+          <actions>
+            <action id="archive-toolkit-create-pdf-rendition" type="javascript" label="actions.archive-toolkit-create-pdf-rendition">
+              <param name="function">onActionSimpleRepoAction</param>
+              <param name="action">archive-toolkit-transform-to-pdf</param>
+              <param name="mime-type">application/pdf</param>
+              <param name="destination-folder">{nodeRef}</param>
+              <param name="assoc-type">rn:rendition</param>
+              <param name="assoc-name">cm:pdf</param>
+              <param name="target-name">pdf</param>
+              <param name="overwrite-copy">true</param>
+              <param name="add-extension">false</param>
+              <param name="target-type">cm:thumbnail</param>
+              <param name="successMessage">message.archive-toolkit-convert-to-pdf-rendition.success</param>
+              <param name="failureMessage">message.archive-toolkit-convert-to-pdf-rendition.failure</param>
+              <evaluator>archive-toolkit.evaluator.doclib.action.isAdmin</evaluator>
+            </action>
+            <action id="archive-toolkit-create-pdfa-rendition" type="javascript" label="actions.archive-toolkit-create-pdfa-rendition">
+              <param name="function">onActionSimpleRepoAction</param>
+              <param name="action">archive-toolkit-transform-to-pdf</param>
+              <param name="mime-type">application/pdfa</param>
+              <param name="destination-folder">{nodeRef}</param>
+              <param name="assoc-type">rn:rendition</param>
+              <param name="assoc-name">cm:pdfa</param>
+              <param name="target-name">pdfa</param>
+              <param name="overwrite-copy">true</param>
+              <param name="add-extension">false</param>
+              <param name="target-type">cm:thumbnail</param>
+              <param name="successMessage">message.archive-toolkit-convert-to-pdfa-rendition.success</param>
+              <param name="failureMessage">message.archive-toolkit-convert-to-pdfa-rendition.failure</param>
+              <evaluator>archive-toolkit.evaluator.doclib.action.isAdmin</evaluator>
+              <evaluator>archive-toolkit.doclib.action.isPdfMimetype</evaluator>
+            </action>
+            
+          </actions>
+          <actionGroups>
+            <actionGroup id="document-details">
+              <action index="998" id="archive-toolkit-create-pdf-rendition" />
+              <action index="999" id="archive-toolkit-create-pdfa-rendition" />               
+            </actionGroup>
+          </actionGroups>
+        </config>
+
+      </configurations>
+    </module>
+  </modules>
+</extension>
