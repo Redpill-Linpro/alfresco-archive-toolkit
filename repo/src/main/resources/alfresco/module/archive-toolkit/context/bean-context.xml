@@ -114,6 +114,7 @@
     <property name="checkOutCheckInService" ref="CheckOutCheckInService" />
     <property name="contentService" ref="ContentService" />
     <property name="copyService" ref="CopyService" />
+    <property name="renditionService" ref="RenditionService" />
     <property name="mimetypeService" ref="mimetypeService" />
     <property name="retryingTransactionHelper" ref="retryingTransactionHelper" />
     <property name="fileFolderService" ref="FileFolderService" />
