@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.alfresco.model.ContentModel;
+import org.alfresco.model.RenditionModel;
 import org.alfresco.repo.action.ParameterDefinitionImpl;
 import org.alfresco.repo.action.executer.ActionExecuterAbstractBase;
 import org.alfresco.repo.audit.AuditComponent;
@@ -36,6 +37,7 @@ import org.alfresco.service.cmr.coci.CheckOutCheckInService;
 import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.model.FileFolderService;
+import org.alfresco.service.cmr.rendition.RenditionService;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.ContentData;
 import org.alfresco.service.cmr.repository.ContentReader;
@@ -50,6 +52,7 @@ import org.alfresco.service.cmr.repository.TransformationOptions;
 import org.alfresco.service.cmr.rule.RuleServiceException;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.redpill.alfresco.archive.repo.service.ArchiveToolkitService;
@@ -105,6 +108,7 @@ public class ConvertToPdfActionExecuter extends ActionExecuterAbstractBase imple
   protected RetryingTransactionHelper retryingTransactionHelper;
   protected FileFolderService fileFolderService;
   protected ArchiveToolkitService archiveToolkitService;
+  protected RenditionService renditionService;
 
   /**
    * Add parameter definitions
@@ -317,9 +321,33 @@ public class ConvertToPdfActionExecuter extends ActionExecuterAbstractBase imple
         }
         
         // To avoid thumbnail node node beeing marked as incomplete, we need to add the targetContentProperty
-        // FIXME this should be done in a more generic way, but I can't find out how it is intended now. 
         if (ContentModel.TYPE_THUMBNAIL.equals(nodeService.getType(destinationNodeRef))){
           nodeService.setProperty(destinationNodeRef, ContentModel.PROP_CONTENT_PROPERTY_NAME, ContentModel.PROP_CONTENT);
+          
+          // is the destination assoc a rendition, alfresco states it must have a correct rendition aspect
+          if (destinationAssocTypeQName != null && destinationAssocTypeQName.equals(RenditionModel.ASSOC_RENDITION)){
+            // Now add one of the two aspects depending on parent location.
+            ChildAssociationRef sourceNode = renditionService.getSourceNode(destinationNodeRef);
+            ChildAssociationRef primaryParent = nodeService.getPrimaryParent(destinationNodeRef);
+            QName aspectToApply;
+            if (primaryParent.getParentRef().equals(sourceNode.getParentRef())) {
+                aspectToApply = RenditionModel.ASPECT_HIDDEN_RENDITION;
+            }else {
+                aspectToApply = RenditionModel.ASPECT_VISIBLE_RENDITION;
+            }
+
+            if (LOGGER.isDebugEnabled())
+            {
+                StringBuilder msg = new StringBuilder();
+                msg.append("Applying aspect ")
+                    .append(aspectToApply)
+                    .append(" to node ")
+                    .append(destinationNodeRef);
+                LOGGER.debug(msg.toString());
+            }
+            nodeService.addAspect(destinationNodeRef, aspectToApply, null);
+          }
+          
         }
 
         if (LOGGER.isTraceEnabled()) {
@@ -589,6 +617,10 @@ public class ConvertToPdfActionExecuter extends ActionExecuterAbstractBase imple
   public void setCopyService(CopyService copyService) {
     this.copyService = copyService;
   }
+  
+  public void setRenditionService(RenditionService renditionService) {
+    this.renditionService = renditionService;
+  }
 
   /**
    * Set the file folder service
@@ -618,6 +650,7 @@ public class ConvertToPdfActionExecuter extends ActionExecuterAbstractBase imple
     Assert.notNull(retryingTransactionHelper);
     Assert.notNull(fileFolderService);
     Assert.notNull(archiveToolkitService);
+    Assert.notNull(renditionService);
   }
 
 }
