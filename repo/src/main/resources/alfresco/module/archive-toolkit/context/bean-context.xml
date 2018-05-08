@@ -78,13 +78,13 @@
                 <value>${gs.exe}</value>
                 <value>-dPDFA=1</value>
                 <value>-dNOOUTERSAVE</value>
-                <value>-sProcessColorModel=DeviceRGB</value>
+                <value>-sProcessColorModel=DeviceCMYK</value>
                 <value>-sDEVICE=pdfwrite</value>
                 <value>-o</value>
                 <value>${target}</value>
                 <value>-sPDFACompatibilityPolicy=1</value>
                 <value>${pdfa.definition.file}</value>
-                <value>${source}</value>
+								<value>${source}</value>
               </list>
             </entry>
           </map>

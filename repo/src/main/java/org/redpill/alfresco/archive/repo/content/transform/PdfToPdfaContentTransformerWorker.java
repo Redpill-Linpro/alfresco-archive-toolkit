@@ -23,8 +23,8 @@ public class PdfToPdfaContentTransformerWorker extends RuntimeExecutableContentT
 
   protected String pdfaDefinitionFile;
   protected String pdfaICCProfileFile;
-  protected static final String PDFA_DEFINITION_TEMPLATE_PATH = "alfresco/module/archive-toolkit/gs/PDFA_def.ps";
-  protected static final String PDFA_ICCPROFILE_PATH = "alfresco/module/archive-toolkit/gs/sRGB_IEC61966-2.1.icc";
+  protected static final String PDFA_DEFINITION_TEMPLATE_PATH = "alfresco/module/archive-toolkit/gs/PDFA_def2.ps";
+  protected static final String PDFA_ICCPROFILE_PATH = "alfresco/module/archive-toolkit/gs/CoatedGRACoL2006.icc";
 
   @Override
   public boolean isTransformable(String sourceMimetype, String targetMimetype, TransformationOptions options) {

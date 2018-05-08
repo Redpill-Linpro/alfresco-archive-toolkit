@@ -197,6 +197,47 @@ public class ConvertToPdfActionExecuterIntegrationTest extends AbstractRepoInteg
     String checksum = (String) _nodeService.getProperty(pdfANodeRef, ArchiveToolkitModel.PROP_CHECKSUM);
     assertNotNull(checksum);
   }
+
+  @Test
+  public void testConvertCMYKPdfToPdfa() throws InterruptedException, IOException {
+    NodeRef document = uploadDocument(site, "Project_Management_Example.pdf", null, null, "test" + System.currentTimeMillis() + ".pdf").getNodeRef();
+
+    Action action = actionService.createAction(ConvertToPdfActionExecuter.NAME);
+    action.setParameterValue(ConvertToPdfActionExecuter.PARAM_MIME_TYPE, ConvertToPdfActionExecuter.FAKE_MIMETYPE_PDFA);
+    action.setParameterValue(ConvertToPdfActionExecuter.PARAM_DESTINATION_FOLDER, document);
+    action.setParameterValue(ConvertToPdfActionExecuter.PARAM_ASSOC_TYPE_QNAME, RenditionModel.ASSOC_RENDITION);
+    QName renditionQName = QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, (String) RENDITION_NAME_PDFA);
+    action.setParameterValue(ConvertToPdfActionExecuter.PARAM_ASSOC_QNAME, renditionQName);
+    action.setParameterValue(ConvertToPdfActionExecuter.PARAM_TARGET_NAME, RENDITION_NAME_PDFA);
+    action.setParameterValue(ConvertToPdfActionExecuter.PARAM_ADD_EXTENSION, false);
+    action.setParameterValue(ConvertToPdfActionExecuter.PARAM_OVERWRITE_COPY, true);
+    action.setParameterValue(ConvertToPdfActionExecuter.PARAM_TARGET_TYPE, ContentModel.TYPE_THUMBNAIL);
+
+    actionService.executeAction(action, document);
+
+    List<ChildAssociationRef> childAssocs = _nodeService.getChildAssocs(document);
+    assertNotNull(childAssocs);
+    assertEquals(1, childAssocs.size());
+    ChildAssociationRef childNode = childAssocs.get(0);
+    NodeRef pdfANodeRef = childNode.getChildRef();
+    assertNotNull(pdfANodeRef);
+    //Assert that there is a child node with name pdfa
+    assertEquals("pdfa", _nodeService.getProperty(pdfANodeRef, ContentModel.PROP_NAME));
+    assertEquals(ContentModel.TYPE_THUMBNAIL, _nodeService.getType(pdfANodeRef));
+    ContentReader reader = _contentService.getReader(pdfANodeRef, ContentModel.PROP_CONTENT);
+    Pair<Boolean, String> validatePdfa = validatePdfa(reader);
+
+    //assertTrue(validatePdfa.getSecond(), validatePdfa.getFirst());
+
+    ContentData contentData = reader.getContentData();
+
+    assertEquals("Wrong mimetype", MimetypeMap.MIMETYPE_PDF, contentData.getMimetype());
+    
+    
+    // Assert there is a checksum written.
+    String checksum = (String) _nodeService.getProperty(pdfANodeRef, ArchiveToolkitModel.PROP_CHECKSUM);
+    assertNotNull(checksum);
+  }
   
   @Test
   public void testConvertCallasProblematicPdfToPdfa() throws InterruptedException, IOException {
