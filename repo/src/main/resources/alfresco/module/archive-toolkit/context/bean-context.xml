@@ -79,6 +79,9 @@
                 <value>-dPDFA=1</value>
                 <value>-dNOOUTERSAVE</value>
                 <value>-sProcessColorModel=DeviceCMYK</value>
+                <value>-dUseCIEColor</value>
+                <value>-sColorConversionStrategy=CMYK</value>
+								<value>-sColorConversionStrategyForImages=CMYK</value>
                 <value>-sDEVICE=pdfwrite</value>
                 <value>-o</value>
                 <value>${target}</value>
