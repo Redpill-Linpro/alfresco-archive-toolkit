@@ -89,6 +89,7 @@ public class ConvertToPdfActionExecuter extends ActionExecuterAbstractBase imple
   public static final String PARAM_OVERWRITE_COPY = "overwrite-copy";
   public static final String PARAM_ADD_EXTENSION = "add-extension";
   public static final String FAKE_MIMETYPE_PDFA = "application/pdfa";
+  public static final String FAKE_MIMETYPE_PDFA_CMYK = "application/pdfacmyk";
   public static final String PARAM_SOURCE_FOLDER = "source-folder";
   public static final String PARAM_SOURCE_FILENAME = "source-filename";
   public static final String PARAM_TARGET_TYPE = "target-type";
@@ -234,7 +235,7 @@ public class ConvertToPdfActionExecuter extends ActionExecuterAbstractBase imple
           selectedName = originalName;
         }
         String newMimetype = mimeType;
-        if (FAKE_MIMETYPE_PDFA.equalsIgnoreCase(mimeType)) {
+        if (FAKE_MIMETYPE_PDFA.equalsIgnoreCase(mimeType) || FAKE_MIMETYPE_PDFA_CMYK.equalsIgnoreCase(mimeType)) {
           newMimetype = MimetypeMap.MIMETYPE_PDF;
         }
         // Get the overwrite value
@@ -315,7 +316,7 @@ public class ConvertToPdfActionExecuter extends ActionExecuterAbstractBase imple
 
         //ContentData contentData = contentWriter.getContentData();
         ContentData contentData = (ContentData) nodeService.getProperty(destinationNodeRef, ContentModel.PROP_CONTENT);
-        if (FAKE_MIMETYPE_PDFA.equalsIgnoreCase(contentData.getMimetype())) {
+        if (FAKE_MIMETYPE_PDFA.equalsIgnoreCase(contentData.getMimetype()) || FAKE_MIMETYPE_PDFA_CMYK.equalsIgnoreCase(contentData.getMimetype())) {
           ContentData newContentData = ContentData.setMimetype(contentData, MimetypeMap.MIMETYPE_PDF);
           nodeService.setProperty(destinationNodeRef, ContentModel.PROP_CONTENT, newContentData);
         }

@@ -15,8 +15,93 @@
     <property name="nodeService" ref="NodeService" />
     <property name="contentService" ref="ContentService" />
   </bean>
-  
+
   <bean id="transformer.worker.Pdf2Pdfa" class="org.redpill.alfresco.archive.repo.content.transform.PdfToPdfaContentTransformerWorker">
+    <property name="mimetypeService">
+      <ref bean="mimetypeService" />
+    </property>
+    <property name="checkCommand">
+      <bean class="org.alfresco.util.exec.RuntimeExec">
+        <property name="commandsAndArguments">
+          <map>
+            <entry key=".*">
+              <list>
+                <value>${gs.exe}</value>
+                <value>--version</value>
+              </list>
+            </entry>
+          </map>
+        </property>
+        <property name="errorCodes">
+          <value>1</value>
+        </property>
+      </bean>
+    </property>
+    <!-- 
+     <property name="transformCommand">
+      <bean class="org.alfresco.util.exec.RuntimeExec">
+        <property name="commandsAndArguments">
+          <map>
+            <entry key=".*">
+              <list>
+                <value>${gs.exe}</value>
+                <value>-dPDFA=1</value>
+                <value>-dSAFER</value>
+                <value>-dNOOUTERSAVE</value>
+                <value>-dBATCH</value>
+                <value>-dNOPAUSE</value>
+                <value>-sColorConversionStrategy=UseDeviceIndependentColor</value>
+                <value>-sProcessColorModel=DeviceCMYK</value>
+                <value>-dEmbedAllFonts=true</value>
+                <value>-sDEVICE=pdfwrite</value>
+                <value>-sPDFACompatibilityPolicy=1</value>
+                <value>-sOutputFile=${target}</value>
+                <value>${source}</value>
+              </list>
+            </entry>
+          </map>
+        </property>
+        <property name="errorCodes">
+          <value>1</value>
+        </property>
+      </bean>
+    </property>
+       -->
+<!-- TODO change to this more correct transformation method. Fix path to icc profile in ps-file.-->
+   
+    <property name="transformCommand">
+      <bean class="org.alfresco.util.exec.RuntimeExec">
+        <property name="commandsAndArguments">
+          <map>
+            <entry key=".*">
+              <list>
+                <value>${gs.exe}</value>
+                <value>-dPDFA=1</value>
+                <value>-dNOOUTERSAVE</value>
+                <value>-sProcessColorModel=DeviceRGB</value>
+                <value>-sDEVICE=pdfwrite</value>
+                <value>-o</value>
+                <value>${target}</value>
+                <value>-sPDFACompatibilityPolicy=1</value>
+                <value>${pdfa.definition.file}</value>
+                <value>${source}</value>
+              </list>
+            </entry>
+          </map>
+        </property>
+        <property name="errorCodes">
+          <value>1</value>
+        </property>
+      </bean>
+    </property>
+ 
+    <!-- <property name="transformerConfig"> <ref bean="transformerConfig" /> </property> -->
+    
+    <property name="pdfaDefinitionFile" value="${pdfa.definition.file}" />
+    <property name="pdfaICCProfileFile" value="${pdfa.iccprofile.file}" />
+	</bean>
+
+  <bean id="transformer.worker.Pdf2PdfaCMYK" class="org.redpill.alfresco.archive.repo.content.transform.PdfToPdfaCMYKContentTransformerWorker">
     <property name="mimetypeService">
       <ref bean="mimetypeService" />
     </property>
@@ -100,8 +185,14 @@
  
     <!-- <property name="transformerConfig"> <ref bean="transformerConfig" /> </property> -->
     
-    <property name="pdfaDefinitionFile" value="${pdfa.definition.file}" />
-    <property name="pdfaICCProfileFile" value="${pdfa.iccprofile.file}" />
+    <property name="pdfaDefinitionFile" value="${pdfa.cmyk.definition.file}" />
+    <property name="pdfaICCProfileFile" value="${pdfa.cmyk.iccprofile.file}" />
+  </bean>
+
+  <bean id="transformer.Pdf2PdfaCMYK" class="org.alfresco.repo.content.transform.ProxyContentTransformer" parent="baseContentTransformer">
+    <property name="worker">
+      <ref bean="transformer.worker.Pdf2PdfaCMYK" />
+    </property>
   </bean>
 
   <bean id="transformer.Pdf2Pdfa" class="org.alfresco.repo.content.transform.ProxyContentTransformer" parent="baseContentTransformer">
