@@ -32,7 +32,7 @@ public class TestPdfa {
     }
   }
 
-  @Test
+
   public void testFile() throws Exception {
     InputStream is = this.getClass().getResourceAsStream("/pdfa_1.pdf");
     assertNotNull(is);
@@ -40,7 +40,6 @@ public class TestPdfa {
     IOUtils.closeQuietly(is);
   }
 
-  @Test
   public void testFile2() throws Exception {
     InputStream is = this.getClass().getResourceAsStream("/pdfa_2.pdf");
     assertNotNull(is);
