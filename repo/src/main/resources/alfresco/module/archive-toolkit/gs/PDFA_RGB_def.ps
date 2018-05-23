@@ -25,7 +25,8 @@ def
 % Define an ICC profile :
 
 [/_objdef {icc_PDFA} /type /stream /OBJ pdfmark
-[{icc_PDFA} <</N systemdict /ProcessColorModel get /DeviceGray eq {1} {3} ifelse >> /PUT pdfmark
+[{icc_PDFA} <</N systemdict /ProcessColorModel get /DeviceGray eq {1} {systemdict /ProcessColorModel get /DeviceRGB eq {3} {4} ifelse} ifelse >> /PUT pdfmark
+%[{icc_PDFA} <</N systemdict /ProcessColorModel get /DeviceGray eq {1} {3} ifelse >> /PUT pdfmark
 [{icc_PDFA} ICCProfile (r) file /PUT pdfmark
 
 % Define the output intent dictionary :
