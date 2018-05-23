@@ -88,16 +88,18 @@
     <dependency>
       <groupId>org.verapdf</groupId>
       <artifactId>core</artifactId>
-      <version>1.8.1</version>
+      <version>1.12.1</version>
       <scope>test</scope>
     </dependency>
     <!-- To be able to use the VeraPDF library we have to use this to initialise the classes -->
     <dependency>
       <groupId>org.verapdf</groupId>
       <artifactId>validation-model</artifactId>
-      <version>1.8.1</version>
+      <version>1.12.1</version>
       <scope>test</scope>
     </dependency>
+
+
   </dependencies>
 
   <build>

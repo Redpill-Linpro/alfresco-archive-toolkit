@@ -18,6 +18,7 @@ import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.util.Pair;
 import org.alfresco.util.TempFileProvider;
+import org.apache.commons.io.FileUtils;
 import org.apache.pdfbox.preflight.PreflightDocument;
 import org.apache.pdfbox.preflight.ValidationResult;
 import org.apache.pdfbox.preflight.ValidationResult.ValidationError;
@@ -29,6 +30,9 @@ import org.redpill.alfresco.archive.repo.model.ArchiveToolkitModel;
 import org.redpill.alfresco.test.AbstractRepoIntegrationTest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.verapdf.core.EncryptedPdfException;
+import org.verapdf.core.ModelParsingException;
+import org.verapdf.core.ValidationException;
 import org.verapdf.pdfa.*;
 import org.verapdf.pdfa.flavours.PDFAFlavour;
 
@@ -71,6 +75,7 @@ public class ConvertToPdfActionExecuterIntegrationTest extends AbstractRepoInteg
     site = createSite();
   }
 
+
   protected boolean validatePdfaVeraPdf(InputStream is) throws Exception {
     // The veraPDF library is unaware of the implementations and needs to be
     // initialised before first use
@@ -80,8 +85,9 @@ public class ConvertToPdfActionExecuterIntegrationTest extends AbstractRepoInteg
     org.verapdf.pdfa.results.ValidationResult vr = null;
     try (VeraPDFFoundry foundry = Foundries.defaultInstance();
          PDFAValidator validator = foundry.createValidator(flavour, false)) {
-      parser = foundry.createParser(is);
+      parser = foundry.createParser(is, flavour);
       vr = validator.validate(parser);
+
       if (vr == null || !vr.isCompliant()) {
         throw new Exception("Failed to validate pdf/a, test Assertions: " + (vr == null ? "null" : (vr.getTestAssertions().toString())));
       }
@@ -179,9 +185,8 @@ public class ConvertToPdfActionExecuterIntegrationTest extends AbstractRepoInteg
     }
   }
 
-  @Test
-  public void testConvertPdfToPdfa() throws Exception {
-    NodeRef document = uploadDocument(site, "test.pdf", null, null, "test" + System.currentTimeMillis() + ".pdf").getNodeRef();
+  protected void testConvert(String fileName) throws Exception {
+    NodeRef document = uploadDocument(site, fileName, null, null, "test" + System.currentTimeMillis() + ".pdf").getNodeRef();
 
     Action action = actionService.createAction(ConvertToPdfActionExecuter.NAME);
     action.setParameterValue(ConvertToPdfActionExecuter.PARAM_MIME_TYPE, ConvertToPdfActionExecuter.FAKE_MIMETYPE_PDFA);
@@ -206,11 +211,22 @@ public class ConvertToPdfActionExecuterIntegrationTest extends AbstractRepoInteg
     assertEquals("pdfa", _nodeService.getProperty(pdfANodeRef, ContentModel.PROP_NAME));
     assertEquals(ContentModel.TYPE_THUMBNAIL, _nodeService.getType(pdfANodeRef));
     ContentReader reader = _contentService.getReader(pdfANodeRef, ContentModel.PROP_CONTENT);
+
+    {
+      //InputStream is = reader.getContentInputStream();
+      File file = new File("/tmp/pdfa_1.pdf");
+      if (!file.exists())
+        assertTrue(file.createNewFile());
+      assertTrue(file.exists());
+      //FileUtils.copyInputStreamToFile(is, file);
+      reader.getContent(file);
+//      is.close();
+    }
+    reader = _contentService.getReader(pdfANodeRef, ContentModel.PROP_CONTENT);
     try (InputStream is = reader.getContentInputStream()){
       boolean result = validatePdfaVeraPdf(is);
       assertTrue("Expected valid pdf", result);
     }
-
     ContentData contentData = reader.getContentData();
 
     assertEquals("Wrong mimetype", MimetypeMap.MIMETYPE_PDF, contentData.getMimetype());
@@ -219,85 +235,25 @@ public class ConvertToPdfActionExecuterIntegrationTest extends AbstractRepoInteg
     // Assert there is a checksum written.
     String checksum = (String) _nodeService.getProperty(pdfANodeRef, ArchiveToolkitModel.PROP_CHECKSUM);
     assertNotNull(checksum);
+  }
+  @Test
+  public void testConvertRGBPdfToPdfa() throws Exception {
+    testConvert("test.pdf");
   }
 
   @Test
   public void testConvertCMYKPdfToPdfa() throws Exception {
-    NodeRef document = uploadDocument(site, "Project_Management_Example.pdf", null, null, "test" + System.currentTimeMillis() + ".pdf").getNodeRef();
-
-    Action action = actionService.createAction(ConvertToPdfActionExecuter.NAME);
-    action.setParameterValue(ConvertToPdfActionExecuter.PARAM_MIME_TYPE, ConvertToPdfActionExecuter.FAKE_MIMETYPE_PDFA);
-    action.setParameterValue(ConvertToPdfActionExecuter.PARAM_DESTINATION_FOLDER, document);
-    action.setParameterValue(ConvertToPdfActionExecuter.PARAM_ASSOC_TYPE_QNAME, RenditionModel.ASSOC_RENDITION);
-    QName renditionQName = QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, (String) RENDITION_NAME_PDFA);
-    action.setParameterValue(ConvertToPdfActionExecuter.PARAM_ASSOC_QNAME, renditionQName);
-    action.setParameterValue(ConvertToPdfActionExecuter.PARAM_TARGET_NAME, RENDITION_NAME_PDFA);
-    action.setParameterValue(ConvertToPdfActionExecuter.PARAM_ADD_EXTENSION, false);
-    action.setParameterValue(ConvertToPdfActionExecuter.PARAM_OVERWRITE_COPY, true);
-    action.setParameterValue(ConvertToPdfActionExecuter.PARAM_TARGET_TYPE, ContentModel.TYPE_THUMBNAIL);
-
-    actionService.executeAction(action, document);
-
-    List<ChildAssociationRef> childAssocs = _nodeService.getChildAssocs(document);
-    assertNotNull(childAssocs);
-    assertEquals(1, childAssocs.size());
-    ChildAssociationRef childNode = childAssocs.get(0);
-    NodeRef pdfANodeRef = childNode.getChildRef();
-    assertNotNull(pdfANodeRef);
-    //Assert that there is a child node with name pdfa
-    assertEquals("pdfa", _nodeService.getProperty(pdfANodeRef, ContentModel.PROP_NAME));
-    assertEquals(ContentModel.TYPE_THUMBNAIL, _nodeService.getType(pdfANodeRef));
-    ContentReader reader = _contentService.getReader(pdfANodeRef, ContentModel.PROP_CONTENT);
-    try (InputStream is = reader.getContentInputStream()){
-      boolean result = validatePdfaVeraPdf(is);
-      assertTrue("Expected valid pdf", result);
-    }
-
-    ContentData contentData = reader.getContentData();
-
-    assertEquals("Wrong mimetype", MimetypeMap.MIMETYPE_PDF, contentData.getMimetype());
-
-
-    // Assert there is a checksum written.
-    String checksum = (String) _nodeService.getProperty(pdfANodeRef, ArchiveToolkitModel.PROP_CHECKSUM);
-    assertNotNull(checksum);
+   testConvert("cmyk.pdf");
   }
 
   @Test
   public void testConvertCallasProblematicPdfToPdfa() throws Exception {
-    NodeRef document = uploadDocument(site, "callasfail.pdf", null, null, "test" + System.currentTimeMillis() + ".pdf").getNodeRef();
+    testConvert("callas.pdf");
+  }
 
-    Action action = actionService.createAction(ConvertToPdfActionExecuter.NAME);
-    action.setParameterValue(ConvertToPdfActionExecuter.PARAM_MIME_TYPE, ConvertToPdfActionExecuter.FAKE_MIMETYPE_PDFA);
-    action.setParameterValue(ConvertToPdfActionExecuter.PARAM_DESTINATION_FOLDER, document);
-    action.setParameterValue(ConvertToPdfActionExecuter.PARAM_ASSOC_TYPE_QNAME, RenditionModel.ASSOC_RENDITION);
-    QName renditionQName = QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, (String) RENDITION_NAME_PDFA);
-    action.setParameterValue(ConvertToPdfActionExecuter.PARAM_ASSOC_QNAME, renditionQName);
-    action.setParameterValue(ConvertToPdfActionExecuter.PARAM_TARGET_NAME, RENDITION_NAME_PDFA);
-    action.setParameterValue(ConvertToPdfActionExecuter.PARAM_ADD_EXTENSION, false);
-    action.setParameterValue(ConvertToPdfActionExecuter.PARAM_OVERWRITE_COPY, true);
-    action.setParameterValue(ConvertToPdfActionExecuter.PARAM_TARGET_TYPE, ContentModel.TYPE_THUMBNAIL);
-
-    actionService.executeAction(action, document);
-
-    List<ChildAssociationRef> childAssocs = _nodeService.getChildAssocs(document);
-    assertNotNull(childAssocs);
-    assertEquals(1, childAssocs.size());
-    ChildAssociationRef childNode = childAssocs.get(0);
-    NodeRef pdfANodeRef = childNode.getChildRef();
-    assertNotNull(pdfANodeRef);
-    //Assert that there is a child node with name pdfa
-    assertEquals("pdfa", _nodeService.getProperty(pdfANodeRef, ContentModel.PROP_NAME));
-    assertEquals(ContentModel.TYPE_THUMBNAIL, _nodeService.getType(pdfANodeRef));
-    ContentReader reader = _contentService.getReader(pdfANodeRef, ContentModel.PROP_CONTENT);
-    try (InputStream is = reader.getContentInputStream()){
-      boolean result = validatePdfaVeraPdf(is);
-      assertTrue("Expected valid pdf", result);
-    }
-
-    ContentData contentData = reader.getContentData();
-
-    assertEquals("Wrong mimetype", MimetypeMap.MIMETYPE_PDF, contentData.getMimetype());
+  @Test
+  public void testConvertExportedWebPagePdfToPdfa() throws Exception {
+    testConvert("webpage.pdf");
   }
 
   @Test
