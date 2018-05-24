@@ -17,3 +17,6 @@ alf_data_dev
 hs_err_pid*
 
 deploy-share.sh
+
+*.iml
+.idea

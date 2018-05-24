@@ -32,24 +32,11 @@ public class PdfToPdfaContentTransformerWorkerTest {
 
   @Test
   public void testInstantiation() throws IOException {
-    final String PDFA_DEF_TARGET = "target/gs/PDF_def.ps";
-    final String PDFA_ICC_TARGET = "target/gs/sRGB_IEC61966-2.1.icc";
+
     PdfToPdfaContentTransformerWorker worker = new PdfToPdfaContentTransformerWorker();
     RuntimeExec transformCommand = m.mock(RuntimeExec.class);
     worker.setTransformCommand(transformCommand);
-    worker.setPdfaDefinitionFile(PDFA_DEF_TARGET);
-    worker.setPdfaICCProfileFile(PDFA_ICC_TARGET);
     worker.afterPropertiesSet();
-
-    File file = new File(PDFA_DEF_TARGET);
-    assertNotNull(file);
-    assertTrue(file.exists());
-    String readFileToString = FileUtils.readFileToString(file);
-    assertTrue(readFileToString.contains(PDFA_ICC_TARGET));
-
-    file = new File(PDFA_ICC_TARGET);
-    assertNotNull(file);
-    assertTrue(file.exists());
 
   }
 }
