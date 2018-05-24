@@ -27,6 +27,14 @@
       <groupId>${alfresco.groupId}</groupId>
       <artifactId>alfresco-repository</artifactId>
       <scope>provided</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>com.adobe.xmp</groupId>
+          <artifactId>xmpcore</artifactId>
+
+        </exclusion>
+
+      </exclusions>
     </dependency>
 
     <dependency>
@@ -76,6 +84,22 @@
       <version>1.8.0</version>
       <scope>provided</scope>
     </dependency>
+    <!-- https://github.com/veraPDF/veraPDF-library -->
+    <dependency>
+      <groupId>org.verapdf</groupId>
+      <artifactId>core</artifactId>
+      <version>1.12.1</version>
+      <scope>test</scope>
+    </dependency>
+    <!-- To be able to use the VeraPDF library we have to use this to initialise the classes -->
+    <dependency>
+      <groupId>org.verapdf</groupId>
+      <artifactId>validation-model</artifactId>
+      <version>1.12.1</version>
+      <scope>test</scope>
+    </dependency>
+
+
   </dependencies>
 
   <build>
@@ -131,7 +155,7 @@
           </includes>
         </configuration>
       </plugin>
-      
+
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-source-plugin</artifactId>
@@ -190,4 +214,3 @@
   </profiles>
 
 </project>
-

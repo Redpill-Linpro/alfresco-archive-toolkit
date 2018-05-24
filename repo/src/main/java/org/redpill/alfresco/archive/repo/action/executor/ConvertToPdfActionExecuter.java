@@ -18,10 +18,6 @@
  */
 package org.redpill.alfresco.archive.repo.action.executor;
 
-import java.io.Serializable;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import org.alfresco.model.ContentModel;
 import org.alfresco.model.RenditionModel;
 import org.alfresco.repo.action.ParameterDefinitionImpl;
@@ -30,7 +26,6 @@ import org.alfresco.repo.audit.AuditComponent;
 import org.alfresco.repo.content.MimetypeMap;
 import org.alfresco.repo.transaction.RetryingTransactionHelper;
 import org.alfresco.repo.transaction.RetryingTransactionHelper.RetryingTransactionCallback;
-
 import org.alfresco.service.cmr.action.Action;
 import org.alfresco.service.cmr.action.ParameterDefinition;
 import org.alfresco.service.cmr.coci.CheckOutCheckInService;
@@ -38,26 +33,20 @@ import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.model.FileFolderService;
 import org.alfresco.service.cmr.rendition.RenditionService;
-import org.alfresco.service.cmr.repository.ChildAssociationRef;
-import org.alfresco.service.cmr.repository.ContentData;
-import org.alfresco.service.cmr.repository.ContentReader;
-import org.alfresco.service.cmr.repository.ContentService;
-import org.alfresco.service.cmr.repository.ContentWriter;
-import org.alfresco.service.cmr.repository.CopyService;
-import org.alfresco.service.cmr.repository.MimetypeService;
-import org.alfresco.service.cmr.repository.NoTransformerException;
-import org.alfresco.service.cmr.repository.NodeRef;
-import org.alfresco.service.cmr.repository.NodeService;
-import org.alfresco.service.cmr.repository.TransformationOptions;
+import org.alfresco.service.cmr.repository.*;
 import org.alfresco.service.cmr.rule.RuleServiceException;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.redpill.alfresco.archive.repo.service.ArchiveToolkitService;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
+
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Action to create pdf or pdfa. Based on the
@@ -79,7 +68,7 @@ public class ConvertToPdfActionExecuter extends ActionExecuterAbstractBase imple
 
 
   /*
-     * Action constants
+   * Action constants
    */
   public static final String PARAM_MIME_TYPE = "mime-type";
   public static final String PARAM_DESTINATION_FOLDER = "destination-folder";
@@ -96,7 +85,7 @@ public class ConvertToPdfActionExecuter extends ActionExecuterAbstractBase imple
   public static final Long DEFAULT_TIMEOUT = 60000L; //Timeout in MS
   public static final String AUDIT_APPLICATION_NAME = "alfresco-archive-toolkit";
   /*
-     * Injected services
+   * Injected services
    */
   protected DictionaryService dictionaryService;
   protected NodeService nodeService;
@@ -130,8 +119,7 @@ public class ConvertToPdfActionExecuter extends ActionExecuterAbstractBase imple
   }
 
   /**
-   * @see
-   * org.alfresco.repo.action.executer.ActionExecuterAbstractBase#executeImpl(org.alfresco.service.cmr.repository.NodeRef,
+   * @see org.alfresco.repo.action.executer.ActionExecuterAbstractBase#executeImpl(org.alfresco.service.cmr.repository.NodeRef,
    * org.alfresco.service.cmr.repository.NodeRef)
    */
   @Override
@@ -152,7 +140,7 @@ public class ConvertToPdfActionExecuter extends ActionExecuterAbstractBase imple
       Boolean addExtensionValue = (Boolean) ruleAction.getParameterValue(PARAM_ADD_EXTENSION);
       String targetName = (String) ruleAction.getParameterValue(PARAM_TARGET_NAME);
       QName targetType = (QName) ruleAction.getParameterValue(PARAM_TARGET_TYPE);
-      
+
       Long timeout = (Long) ruleAction.getParameterValue(PARAM_TIMEOUT);
       if (timeout == null) {
         timeout = DEFAULT_TIMEOUT;
@@ -260,7 +248,7 @@ public class ConvertToPdfActionExecuter extends ActionExecuterAbstractBase imple
 
             // We know that it is in the destination parent, but avoid working copies
             if (checkOutCheckInService.isWorkingCopy(childNodeRef)) {
-              // It is a working copy, skip it              
+              // It is a working copy, skip it
             } else if (newName.equals(childName)) {
               destinationNodeRef = childNodeRef;
               break;
@@ -298,7 +286,7 @@ public class ConvertToPdfActionExecuter extends ActionExecuterAbstractBase imple
             LOGGER.trace("Calling transformation for: " + actionedUponNodeRef + " timeout set to " + timeout);
           }
           doTransform(ruleAction, actionedUponNodeRef, contentReader, destinationNodeRef, contentWriter, timeout);
-          
+
           if (LOGGER.isTraceEnabled()) {
             LOGGER.trace("Transformation done to destination nodeRef: " + destinationNodeRef + " setting content property.");
           }
@@ -306,9 +294,9 @@ public class ConvertToPdfActionExecuter extends ActionExecuterAbstractBase imple
         } catch (NoTransformerException e) {
           if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("No transformer found to execute rule: \n"
-                    + "   reader: " + contentReader + "\n"
-                    + "   writer: " + contentWriter + "\n"
-                    + "   action: " + this);
+              + "   reader: " + contentReader + "\n"
+              + "   writer: " + contentWriter + "\n"
+              + "   action: " + this);
           }
           throw new RuleServiceException(TRANSFORMING_ERROR_MESSAGE + e.getMessage());
         }
@@ -319,48 +307,47 @@ public class ConvertToPdfActionExecuter extends ActionExecuterAbstractBase imple
           ContentData newContentData = ContentData.setMimetype(contentData, MimetypeMap.MIMETYPE_PDF);
           nodeService.setProperty(destinationNodeRef, ContentModel.PROP_CONTENT, newContentData);
         }
-        
+
         // To avoid thumbnail node node beeing marked as incomplete, we need to add the targetContentProperty
-        if (ContentModel.TYPE_THUMBNAIL.equals(nodeService.getType(destinationNodeRef))){
+        if (ContentModel.TYPE_THUMBNAIL.equals(nodeService.getType(destinationNodeRef))) {
           nodeService.setProperty(destinationNodeRef, ContentModel.PROP_CONTENT_PROPERTY_NAME, ContentModel.PROP_CONTENT);
-          
+
           // is the destination assoc a rendition, alfresco states it must have a correct rendition aspect
-          if (destinationAssocTypeQName != null && destinationAssocTypeQName.equals(RenditionModel.ASSOC_RENDITION)){
+          if (destinationAssocTypeQName != null && destinationAssocTypeQName.equals(RenditionModel.ASSOC_RENDITION)) {
             // Now add one of the two aspects depending on parent location.
             ChildAssociationRef sourceNode = renditionService.getSourceNode(destinationNodeRef);
             ChildAssociationRef primaryParent = nodeService.getPrimaryParent(destinationNodeRef);
             QName aspectToApply;
             if (primaryParent.getParentRef().equals(sourceNode.getParentRef())) {
-                aspectToApply = RenditionModel.ASPECT_HIDDEN_RENDITION;
-            }else {
-                aspectToApply = RenditionModel.ASPECT_VISIBLE_RENDITION;
+              aspectToApply = RenditionModel.ASPECT_HIDDEN_RENDITION;
+            } else {
+              aspectToApply = RenditionModel.ASPECT_VISIBLE_RENDITION;
             }
 
-            if (LOGGER.isDebugEnabled())
-            {
-                StringBuilder msg = new StringBuilder();
-                msg.append("Applying aspect ")
-                    .append(aspectToApply)
-                    .append(" to node ")
-                    .append(destinationNodeRef);
-                LOGGER.debug(msg.toString());
+            if (LOGGER.isDebugEnabled()) {
+              StringBuilder msg = new StringBuilder();
+              msg.append("Applying aspect ")
+                .append(aspectToApply)
+                .append(" to node ")
+                .append(destinationNodeRef);
+              LOGGER.debug(msg.toString());
             }
             nodeService.addAspect(destinationNodeRef, aspectToApply, null);
           }
-          
+
         }
 
         if (LOGGER.isTraceEnabled()) {
           LOGGER.trace("Finished transformation to pdf for " + actionedUponNodeRef + " adding checksum calculation to node.");
         }
-        
+
         try {
           archiveToolkitService.addChecksum(destinationNodeRef);
-        }catch (Exception e){
+        } catch (Exception e) {
           // A failed checksum should not rollback everything, just log it
           LOGGER.warn("Failed to set checksum on nodeRef: " + destinationNodeRef);
         }
-        
+
         {
           auditPost(actionedUponNodeRef, sourceFolder, sourceFilename, mimeType, destinationParent, destinationAssocTypeQName, destinationAssocQName, overwriteValue, addExtensionValue, targetName, destinationNodeRef, newName, targetType, timeout);
         }
@@ -454,16 +441,16 @@ public class ConvertToPdfActionExecuter extends ActionExecuterAbstractBase imple
    * Executed in a new transaction so that failures don't cause the entire
    * transaction to rollback.
    *
-   * @param ruleAction the action
-   * @param sourceNodeRef the source node
-   * @param contentReader the source reader
+   * @param ruleAction         the action
+   * @param sourceNodeRef      the source node
+   * @param contentReader      the source reader
    * @param destinationNodeRef the destination node
-   * @param contentWriter the destination reader
-   * @param timeout timeout in ms for the transformation
+   * @param contentWriter      the destination reader
+   * @param timeout            timeout in ms for the transformation
    */
   protected void doTransform(Action ruleAction,
-          NodeRef sourceNodeRef, ContentReader contentReader,
-          NodeRef destinationNodeRef, ContentWriter contentWriter, Long timeout) {
+                             NodeRef sourceNodeRef, ContentReader contentReader,
+                             NodeRef destinationNodeRef, ContentWriter contentWriter, Long timeout) {
     // transform - will throw NoTransformerException if there are no transformers
     TransformationOptions options = newTransformationOptions(ruleAction, sourceNodeRef);
     options.setTimeoutMs(timeout);
@@ -476,16 +463,15 @@ public class ConvertToPdfActionExecuter extends ActionExecuterAbstractBase imple
    * If the original name seems to end with a reasonable file extension, then
    * the name will be transformed such that the old extension is replaced with
    * the new. Otherwise the name will be returned unaltered.
-   * <P/>
+   * <p/>
    * The original name will be deemed to have a reasonable extension if there
    * are one or more characters after the (required) final dot, none of which
    * are spaces.
    *
    * @param mimetypeService the mimetype service
-   * @param original the original name
-   * @param newMimetype the new mime type
-   * @param alwaysAdd if the name has no extension, then add the new one
-   *
+   * @param original        the original name
+   * @param newMimetype     the new mime type
+   * @param alwaysAdd       if the name has no extension, then add the new one
    * @return name with new extension as appropriate for the mimetype
    */
   public static String transformName(MimetypeService mimetypeService, String original, String newMimetype, boolean alwaysAdd) {
@@ -617,7 +603,7 @@ public class ConvertToPdfActionExecuter extends ActionExecuterAbstractBase imple
   public void setCopyService(CopyService copyService) {
     this.copyService = copyService;
   }
-  
+
   public void setRenditionService(RenditionService renditionService) {
     this.renditionService = renditionService;
   }
@@ -630,7 +616,7 @@ public class ConvertToPdfActionExecuter extends ActionExecuterAbstractBase imple
   public void setFileFolderService(FileFolderService fileFolderService) {
     this.fileFolderService = fileFolderService;
   }
-  
+
   public void setArchiveToolkitService(ArchiveToolkitService archiveToolkitService) {
     this.archiveToolkitService = archiveToolkitService;
   }

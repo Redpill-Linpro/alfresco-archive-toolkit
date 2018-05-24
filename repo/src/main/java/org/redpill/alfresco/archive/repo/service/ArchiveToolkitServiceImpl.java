@@ -1,8 +1,5 @@
 package org.redpill.alfresco.archive.repo.service;
 
-import java.io.InputStream;
-import java.security.MessageDigest;
-
 import org.alfresco.model.ContentModel;
 import org.alfresco.service.cmr.repository.ContentReader;
 import org.alfresco.service.cmr.repository.ContentService;
@@ -16,14 +13,17 @@ import org.redpill.alfresco.archive.repo.model.ArchiveToolkitModel;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
 
+import java.io.InputStream;
+import java.security.MessageDigest;
+
 public class ArchiveToolkitServiceImpl implements ArchiveToolkitService, InitializingBean {
   private final static Log LOGGER = LogFactory.getLog(ArchiveToolkitServiceImpl.class);
   private ContentService contentService;
   private NodeService nodeService;
-  
+
   // Default to md5, could be changed by injection
   private String checksumAlgorithm = ArchiveToolkitModel.CHECKSUM_MD5;
-  
+
   private static final int STREAM_BUFFER_LENGTH = 32 * 1024;
 
   @Override
@@ -51,34 +51,34 @@ public class ArchiveToolkitServiceImpl implements ArchiveToolkitService, Initial
     } finally {
       IOUtils.closeQuietly(inputStream);
     }
-    
+
     // Add aspect if not present.
-    if(!nodeService.hasAspect(nodeRef, ArchiveToolkitModel.ASPECT_CHECKSUMMED)){
+    if (!nodeService.hasAspect(nodeRef, ArchiveToolkitModel.ASPECT_CHECKSUMMED)) {
       nodeService.addAspect(nodeRef, ArchiveToolkitModel.ASPECT_CHECKSUMMED, null);
     }
-    
-    if (LOGGER.isTraceEnabled()){
+
+    if (LOGGER.isTraceEnabled()) {
       LOGGER.trace("Adding " + checksumAlgorithm + " checksum: " + checksum + " property to NodeRef: " + nodeRef);
     }
     // set checksum property
     nodeService.setProperty(nodeRef, ArchiveToolkitModel.PROP_CHECKSUM, checksum);
   }
-  
+
   public String getChecksum(final InputStream inputStream, String checksumAlgorithm) {
-    
+
     // Make it possible to choose checksum algorithm, now we return md5 in both cases
-    if (ArchiveToolkitModel.CHECKSUM_MD5.equals(checksumAlgorithm)){
+    if (ArchiveToolkitModel.CHECKSUM_MD5.equals(checksumAlgorithm)) {
       return md5Hex(inputStream);
-    }else if (ArchiveToolkitModel.CHECKSUM_SHA1.equals(checksumAlgorithm)){
+    } else if (ArchiveToolkitModel.CHECKSUM_SHA1.equals(checksumAlgorithm)) {
       return sha1Hex(inputStream);
-    }else{
-      if (LOGGER.isWarnEnabled()){
+    } else {
+      if (LOGGER.isWarnEnabled()) {
         LOGGER.warn("There has been no default checksum algorithm choosen, will use md5 as default.");
       }
       return md5Hex(inputStream); // default to md5
     }
   }
-  
+
   private String md5Hex(final InputStream data) {
     return new String(Hex.encodeHex(md5(data)));
   }
@@ -106,11 +106,11 @@ public class ArchiveToolkitServiceImpl implements ArchiveToolkitService, Initial
       throw new RuntimeException(ex);
     }
   }
-  
-  private String sha1Hex(final InputStream data){
+
+  private String sha1Hex(final InputStream data) {
     return new String(Hex.encodeHex(sha1(data)));
   }
-  
+
   public byte[] sha1(final InputStream data) {
     try {
       return digest(MessageDigest.getInstance("SHA1"), data);
@@ -127,7 +127,7 @@ public class ArchiveToolkitServiceImpl implements ArchiveToolkitService, Initial
   public void setNodeService(NodeService nodeService) {
     this.nodeService = nodeService;
   }
-  
+
   public void setChecksumAlgorithm(String checksumAlgorithm) {
     this.checksumAlgorithm = checksumAlgorithm;
   }
