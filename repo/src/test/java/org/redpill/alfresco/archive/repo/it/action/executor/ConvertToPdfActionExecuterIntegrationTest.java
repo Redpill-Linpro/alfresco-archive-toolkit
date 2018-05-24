@@ -186,6 +186,7 @@ public class ConvertToPdfActionExecuterIntegrationTest extends AbstractRepoInteg
   }
 
   protected void testConvert(String fileName) throws Exception {
+
     NodeRef document = uploadDocument(site, fileName, null, null, "test" + System.currentTimeMillis() + ".pdf").getNodeRef();
 
     Action action = actionService.createAction(ConvertToPdfActionExecuter.NAME);
@@ -236,22 +237,22 @@ public class ConvertToPdfActionExecuterIntegrationTest extends AbstractRepoInteg
     String checksum = (String) _nodeService.getProperty(pdfANodeRef, ArchiveToolkitModel.PROP_CHECKSUM);
     assertNotNull(checksum);
   }
-  @Test
+  //@Test
   public void testConvertRGBPdfToPdfa() throws Exception {
     testConvert("test.pdf");
   }
 
-  @Test
+  //@Test
   public void testConvertCMYKPdfToPdfa() throws Exception {
    testConvert("cmyk.pdf");
   }
 
-  @Test
+  //@Test
   public void testConvertCallasProblematicPdfToPdfa() throws Exception {
     testConvert("callas.pdf");
   }
 
-  @Test
+  //@Test
   public void testConvertExportedWebPagePdfToPdfa() throws Exception {
     testConvert("webpage.pdf");
   }
