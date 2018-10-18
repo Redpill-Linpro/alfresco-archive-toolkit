@@ -46,7 +46,6 @@
               <list>
                 <value>${pdf2archive.exe}</value>
                 <value>--gspath=${gs.exe}</value>
-                <value>--debug</value>
                 <value>${source}</value>
                 <value>${target}</value>
               </list>
