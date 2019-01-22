@@ -80,6 +80,10 @@
 
   <repositories>
     <repository>
+      <id>central</id>
+      <url>https://repo.maven.apache.org/maven2</url>
+    </repository>
+    <repository>
       <id>redpill-public</id>
       <url>https://maven.redpill-linpro.com/nexus/content/groups/public</url>
     </repository>
