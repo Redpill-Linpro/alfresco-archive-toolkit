@@ -45,7 +45,6 @@
             <entry key=".*">
               <list>
                 <value>${pdf2archive.exe}</value>
-                <value>--gspath=${gs.exe}</value>
                 <value>${pdf2archive.extraflags}</value>
                 <value>${source}</value>
                 <value>${target}</value>
