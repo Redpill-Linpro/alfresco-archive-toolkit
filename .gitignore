@@ -20,3 +20,6 @@ deploy-share.sh
 
 *.iml
 .idea
+
+*.html
+*.png

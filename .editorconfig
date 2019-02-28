@@ -1,12 +1,19 @@
-root = true
 [*]
-charset = utf-8
-end_of_line = lf
-indent_size = 2
-indent_style = space
-insert_final_newline = true
-max_line_length = 300
-trim_trailing_whitespace = true
-[*.md]
-max_line_length = 0
-trim_trailing_whitespace = false
+charset=utf-8
+end_of_line=lf
+insert_final_newline=false
+indent_style=space
+indent_size=2
+
+[*.json]
+indent_style=space
+indent_size=2
+
+[{org.codehaus.groovy.runtime.ExtensionModule,*.properties}]
+indent_style=space
+indent_size=4
+
+[{*.groovy,*.gant,*.gy,*.gdsl}]
+indent_style=space
+indent_size=4
+

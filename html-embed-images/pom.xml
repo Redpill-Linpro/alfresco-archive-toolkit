@@ -1,34 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
 
-  <parent>
-    <groupId>com.redpill-linpro.alfresco</groupId>
-    <artifactId>alfresco-base</artifactId>
-    <version>1.1.1.22</version>
-  </parent>
-
-
   <groupId>org.redpill-linpro.alfresco.archive</groupId>
-  <artifactId>alfresco-archive-toolkit</artifactId>
+  <artifactId>html-embed-images</artifactId>
   <version>1.2.0-SNAPSHOT</version>
-  <name>Alfresco Archive Toolkit</name>
-  <packaging>pom</packaging>
+
+  <name>HTML Embed Images</name>
+  <packaging>jar</packaging>
 
   <properties>
-    <alfresco.groupId>org.alfresco</alfresco.groupId>
-    <alfresco.version>4.2.f</alfresco.version>
     <java.source.version>1.8</java.source.version>
     <java.target.version>1.8</java.target.version>
   </properties>
-
-  <modules>
-    <module>repo</module>
-    <module>share</module>
-    <module>html-embed-images</module>
-  </modules>
 
   <developers>
     <developer>
@@ -44,23 +31,11 @@
       </roles>
       <timezone>+1</timezone>
     </developer>
-    <developer>
-      <id>erib</id>
-      <name>Erik Billerby</name>
-      <email>erik.billerby (at) redpill-linpro.com</email>
-      <organization>Redpill Linpro AB</organization>
-      <organizationUrl>http://www.redpill-linpro.com</organizationUrl>
-      <roles>
-        <role>Founder</role>
-        <role>Architect</role>
-        <role>Developer</role>
-      </roles>
-      <timezone>+1</timezone>
-    </developer>
+
   </developers>
 
   <contributors>
-    <contributor />
+    <contributor/>
   </contributors>
 
   <organization>
@@ -89,6 +64,42 @@
       <url>https://maven.redpill-linpro.com/nexus/content/groups/public</url>
     </repository>
   </repositories>
+
+
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.12</version>
+      <scope>test</scope>
+    </dependency>
+
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <source>1.8</source>
+          <target>1.8</target>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <configuration>
+          <archive>
+            <manifest>
+              <addClasspath>true</addClasspath>
+              <mainClass>org.redpill_linpro.alfresco.archive.HtmlEmbedImages</mainClass>
+            </manifest>
+          </archive>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 
 </project>
 
