@@ -52,10 +52,6 @@ public class HtmlEmbedImages {
 
         while (matcher.find()) {
           String imgFileName = matcher.group(1);
-          if (imgFileNames.contains(imgFileName)) {
-            //Do not handle the same file twice
-            continue;
-          }
           if (verbose)
             System.out.println("Embedding " + imgFileName);
           imgFileNames.add(imgFileName);

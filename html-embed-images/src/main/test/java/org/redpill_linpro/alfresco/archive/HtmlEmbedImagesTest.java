@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -97,6 +98,8 @@ public class HtmlEmbedImagesTest {
 
       String absPath = tempDirectory.toAbsolutePath() + "/family_budget.html";
       new HtmlEmbedImages(absPath, true);
+      String contents = new String(Files.readAllBytes(Paths.get(absPath)));
+      assert(!contents.contains("family_budget_html_7acd3ca0932d29a2.png"));
     }
   }
 }
