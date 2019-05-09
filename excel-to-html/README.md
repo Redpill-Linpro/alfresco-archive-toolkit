@@ -8,7 +8,7 @@ Script to launch convert an excel file to HTML and embed images using LibreOffic
 
 
 **Example:**
-./excel-to-html.sh testfiles/family_budget.xls testfiles /Applications/LibreOffice.app/Contents/MacOS/soffice /tmp ../html-embed-images/target/html-embed-images-1.2.0-SNAPSHOT.jar 
+./excel-to-html.sh testfiles/family_budget.xls testfiles /Applications/LibreOffice.app/Contents/MacOS/soffice /tmp ../html-embed-images/target/html-embed-images-1.2.0.jar
 
 **Output:**
 ```

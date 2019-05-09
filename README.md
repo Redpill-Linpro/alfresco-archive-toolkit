@@ -21,7 +21,7 @@ Repository dependency:
 <dependency>
   <groupId>org.redpill-linpro.alfresco.archive</groupId>
   <artifactId>alfresco-archive-toolkit</artifactId>
-  <version>1.2.0-SNAPSHOT</version>
+  <version>1.2.0</version>
 </dependency>
 ```
 
@@ -30,7 +30,7 @@ Share dependency:
 <dependency>
   <groupId>org.redpill-linpro.alfresco.archive</groupId>
   <artifactId>alfresco-archive-toolkit</artifactId>    
-  <version>1.2.0-SNAPSHOT</version>
+  <version>1.2.0</version>
 </dependency>
 ```
 
