@@ -44,6 +44,8 @@ Maven repository:
 
 The jar files are also downloadable from: https://maven.redpill-linpro.com/nexus/index.html#nexus-search;quick~alfresco-archive-toolkit
 
+The Excel to HTML tools are built using package.sh. This creates a zip file containing the necessary shell files and jar files for Excel to HTML conversions. Install on your server and configure according to the instructions below.
+
 PDF to PDF/a conversion
 -----------------------
 Conversion from PDF to PDF/a is done using the Alfresco action ConvertToPdfActionExecuter using the fake file extension pdfa & fake mimetype application/pdfa
