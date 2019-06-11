@@ -52,8 +52,8 @@ Ghostscript and ghostscript resource files
 -------------------------------------------
  
 To convert from pdf to pdf/a Ghostscript needs to be installed. Add the path to the ghostscript executable by setting 
-``gs.exe=path_to_ghostscript``` in your alfresco-global.properties file. A converter called pdf2archive is also used in the 
-conversion proccess. Add the path to the pdf2archive executable in alfresco-global.properties: ```pdf2archive.exe=path_to_pdf2archive``` 
+`gs.exe=path_to_ghostscript` in your alfresco-global.properties file. A converter called pdf2archive is also used in the 
+conversion proccess. Add the path to the pdf2archive executable in alfresco-global.properties: `pdf2archive.exe=path_to_pdf2archive` 
 
 
 Usage
