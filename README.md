@@ -74,4 +74,7 @@ Authors
 -------
 
 Marcus Svartmark - Redpill Linpro AB
+
 Erik Billerby - Redpill Linpro AB
+
+Anton Häägg - Redpill Linpro AB
