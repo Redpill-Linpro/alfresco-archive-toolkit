@@ -24,3 +24,4 @@ deploy-share.sh
 *.html
 *.png
 .DS_Store
+*.zip
