@@ -99,7 +99,7 @@
                 <value>${target}</value>
                 <value>${excel.soffice}</value>
                 <value>${excel.libreoffice.user}</value>
-                <value>${excel.embed.images.target}</value>
+                <value>${excelToHtml.path}</value>
               </list>
             </entry>
           </map>

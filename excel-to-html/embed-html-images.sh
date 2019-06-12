@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Script to launch convert an excel file to HTML and embed images using LibreOffice
+# Script to launch convert an output HTML file from LibreOffice to a HTML file with embedded images
 # Usage: embed-html-images.sh /path/to/spreadsheet.html /path/to/html-embed-images.jar /optional/path/to/java/bin/dir
 INPUT_FILE_NAME=$1
 EMBED_EXEC=$2
