@@ -20,3 +20,8 @@ deploy-share.sh
 
 *.iml
 .idea
+
+*.html
+*.png
+.DS_Store
+*.zip

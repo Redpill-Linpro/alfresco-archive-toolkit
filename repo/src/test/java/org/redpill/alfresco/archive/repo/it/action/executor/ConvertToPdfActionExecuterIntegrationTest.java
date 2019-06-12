@@ -16,28 +16,16 @@ import org.alfresco.service.cmr.rule.RuleServiceException;
 import org.alfresco.service.cmr.site.SiteInfo;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
-import org.alfresco.util.Pair;
-import org.alfresco.util.TempFileProvider;
-import org.apache.commons.io.FileUtils;
-import org.apache.pdfbox.preflight.PreflightDocument;
-import org.apache.pdfbox.preflight.ValidationResult;
-import org.apache.pdfbox.preflight.ValidationResult.ValidationError;
-import org.apache.pdfbox.preflight.exception.SyntaxValidationException;
-import org.apache.pdfbox.preflight.parser.PreflightParser;
 import org.junit.Test;
 import org.redpill.alfresco.archive.repo.action.executor.ConvertToPdfActionExecuter;
 import org.redpill.alfresco.archive.repo.model.ArchiveToolkitModel;
 import org.redpill.alfresco.test.AbstractRepoIntegrationTest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.verapdf.core.EncryptedPdfException;
-import org.verapdf.core.ModelParsingException;
-import org.verapdf.core.ValidationException;
 import org.verapdf.pdfa.*;
 import org.verapdf.pdfa.flavours.PDFAFlavour;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -95,61 +83,6 @@ public class ConvertToPdfActionExecuterIntegrationTest extends AbstractRepoInteg
     return vr.isCompliant();
   }
 
-  protected Pair<Boolean, String> validatePdfaOld(ContentReader reader) throws IOException {
-    File tempFile = TempFileProvider.createTempFile("pdfa", ".pdf");
-    reader.getContent(tempFile);
-    return validatePdfaOld(tempFile);
-  }
-
-  protected Pair<Boolean, String> validatePdfaOld(File file) throws IOException {
-    ValidationResult result = null;
-
-    PreflightParser parser = new PreflightParser(file);
-    try {
-
-      /* Parse the PDF file with PreflightParser that inherits from the NonSequentialParser.
-       * Some additional controls are present to check a set of PDF/A requirements.
-       * (Stream length consistency, EOL after some Keyword...)
-       */
-      parser.parse();
-
-      /* Once the syntax validation is done,
-       * the parser can provide a PreflightDocument
-       * (that inherits from PDDocument)
-       * This document process the end of PDF/A validation.
-       */
-      PreflightDocument document = parser.getPreflightDocument();
-      document.validate();
-
-      // Get validation result
-      result = document.getResult();
-      document.close();
-
-    } catch (SyntaxValidationException e) {
-      /* the parse method can throw a SyntaxValidationException
-       * if the PDF file can't be parsed.
-       * In this case, the exception contains an instance of ValidationResult
-       */
-      result = e.getResult();
-    }
-
-// display validation result
-    if (result.isValid()) {
-      System.out.println("The file " + file + " is a valid PDF/A-1b file");
-      return new Pair<Boolean, String>(true, "The file " + file + " is a valid PDF/A-1b file");
-    } else {
-      StringBuilder sb = new StringBuilder();
-      sb.append("The file" + file + " is not valid, error(s) :\n");
-
-      for (ValidationError error : result.getErrorsList()) {
-        sb.append(error.getErrorCode() + " : " + error.getDetails() + "\n");
-
-      }
-      System.out.println(sb.toString());
-      return new Pair<Boolean, String>(false, sb.toString());
-    }
-  }
-
   @Test
   public void testConvertOdtToPdf() throws Exception {
 
@@ -179,7 +112,7 @@ public class ConvertToPdfActionExecuterIntegrationTest extends AbstractRepoInteg
     //Assert that there is a child node with name pdf.pdf
     assertEquals("pdf.pdf", _nodeService.getProperty(pdfNodeRef, ContentModel.PROP_NAME));
     ContentReader reader = _contentService.getReader(pdfNodeRef, ContentModel.PROP_CONTENT);
-    try (InputStream is = reader.getContentInputStream()){
+    try (InputStream is = reader.getContentInputStream()) {
       boolean result = validatePdfaVeraPdf(is);
       assertFalse("Expected invalid pdf", result);
     }
@@ -224,7 +157,7 @@ public class ConvertToPdfActionExecuterIntegrationTest extends AbstractRepoInteg
 //      is.close();
     }
     reader = _contentService.getReader(pdfANodeRef, ContentModel.PROP_CONTENT);
-    try (InputStream is = reader.getContentInputStream()){
+    try (InputStream is = reader.getContentInputStream()) {
       boolean result = validatePdfaVeraPdf(is);
       assertTrue("Expected valid pdf", result);
     }
@@ -237,6 +170,7 @@ public class ConvertToPdfActionExecuterIntegrationTest extends AbstractRepoInteg
     String checksum = (String) _nodeService.getProperty(pdfANodeRef, ArchiveToolkitModel.PROP_CHECKSUM);
     assertNotNull(checksum);
   }
+
   //@Test
   public void testConvertRGBPdfToPdfa() throws Exception {
     testConvert("test.pdf");
@@ -244,7 +178,7 @@ public class ConvertToPdfActionExecuterIntegrationTest extends AbstractRepoInteg
 
   //@Test
   public void testConvertCMYKPdfToPdfa() throws Exception {
-   testConvert("cmyk.pdf");
+    testConvert("cmyk.pdf");
   }
 
   //@Test

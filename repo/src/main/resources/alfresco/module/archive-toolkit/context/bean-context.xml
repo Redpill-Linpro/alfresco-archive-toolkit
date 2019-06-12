@@ -66,6 +66,58 @@
     </property>
   </bean>
 
+  <bean id="transformer.worker.ExcelToHtml" class="org.redpill.alfresco.archive.repo.content.transform.ExcelToHtmlContentTransformerWorker">
+    <property name="mimetypeService">
+      <ref bean="mimetypeService" />
+    </property>
+    <property name="checkCommand">
+      <bean class="org.alfresco.util.exec.RuntimeExec">
+        <property name="commandsAndArguments">
+          <map>
+            <entry key=".*">
+              <list>
+                <value>${excelToHtml.exe}</value>
+                <value>--version</value>
+              </list>
+            </entry>
+          </map>
+        </property>
+        <property name="errorCodes">
+          <value>1</value>
+        </property>
+      </bean>
+    </property>
+
+    <property name="transformCommand">
+      <bean class="org.alfresco.util.exec.RuntimeExec">
+        <property name="commandsAndArguments">
+          <map>
+            <entry key=".*">
+              <list>
+                <value>${excelToHtml.exe}</value>
+                <value>${source}</value>
+                <value>${target}</value>
+                <value>${excel.soffice}</value>
+                <value>${excel.libreoffice.user}</value>
+                <value>${excelToHtml.path}</value>
+              </list>
+            </entry>
+          </map>
+        </property>
+        <property name="errorCodes">
+          <value>1</value>
+        </property>
+      </bean>
+    </property>
+
+  </bean>
+
+  <bean id="transformer.ExcelToHtml" class="org.alfresco.repo.content.transform.ProxyContentTransformer" parent="baseContentTransformer">
+    <property name="worker">
+      <ref bean="transformer.worker.ExcelToHtml" />
+    </property>
+  </bean>
+
   <bean id="archive-toolkit-transform-to-pdf" class="org.redpill.alfresco.archive.repo.action.executor.ConvertToPdfActionExecuter" parent="action-executer">
     <property name="auditComponent" ref="auditComponent" />
     <property name="dictionaryService" ref="dictionaryService" />

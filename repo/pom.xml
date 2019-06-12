@@ -5,7 +5,7 @@
   <parent>
     <groupId>org.redpill-linpro.alfresco.archive</groupId>
     <artifactId>alfresco-archive-toolkit</artifactId>
-    <version>1.1.3</version>
+    <version>1.2.0</version>
   </parent>
 
   <artifactId>alfresco-archive-toolkit-repo</artifactId>
@@ -62,7 +62,7 @@
     <dependency>
       <groupId>org.apache.httpcomponents</groupId>
       <artifactId>httpclient</artifactId>
-      <version>4.1.1</version>
+      <version>4.3.6</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
@@ -71,19 +71,7 @@
       <version>1.0.16</version>
       <scope>test</scope>
     </dependency>
-    <!-- <dependency> <groupId>org.alfresco</groupId> <artifactId>alfresco-repository</artifactId> <version>${alfresco.version}</version> <classifier>h2scripts</classifier> <scope>test</scope> </dependency> -->
-    <dependency>
-      <groupId>org.apache.pdfbox</groupId>
-      <artifactId>preflight</artifactId>
-      <version>1.8.0</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.pdfbox</groupId>
-      <artifactId>pdfbox</artifactId>
-      <version>1.8.0</version>
-      <scope>provided</scope>
-    </dependency>
+
     <!-- https://github.com/veraPDF/veraPDF-library -->
     <dependency>
       <groupId>org.verapdf</groupId>
@@ -98,7 +86,12 @@
       <version>1.12.1</version>
       <scope>test</scope>
     </dependency>
-
+    <dependency>
+      <artifactId>html-embed-images</artifactId>
+      <groupId>org.redpill-linpro.alfresco.archive</groupId>
+      <version>1.2.0</version>
+      <scope>compile</scope>
+    </dependency>
 
   </dependencies>
 
