@@ -21,7 +21,7 @@ Repository dependency:
 <dependency>
   <groupId>org.redpill-linpro.alfresco.archive</groupId>
   <artifactId>alfresco-archive-toolkit</artifactId>
-  <version>1.2.0</version>
+  <version>1.2.1</version>
 </dependency>
 ```
 
@@ -30,7 +30,7 @@ Share dependency:
 <dependency>
   <groupId>org.redpill-linpro.alfresco.archive</groupId>
   <artifactId>alfresco-archive-toolkit</artifactId>    
-  <version>1.2.0</version>
+  <version>1.2.1</version>
 </dependency>
 ```
 
@@ -90,12 +90,12 @@ Usage: `embed-html-images.sh /path/to/spreadsheet.html /path/to/html-embed-image
 ```
 #Path to excel-to-html.sh script
 excelToHtml.exe=/opt/alfresco/excel2html/excel-to-html.sh
+#The path to where the shell scripts and jar file exists
+excelToHtml.path=/opt/alfresco/excel2html
 #Path to LibreOffice binary
-excel.soffice=/usr/lib/libreoffice/program/soffice.bin
+excel.soffice=${ooo.exe}
 #Temporary directory, used for conversions and LibreOffice temporary files
 excel.libreoffice.user=${java.io.tmpdir}
-#Path Java application which embeds images in html
-excel.embed.images.target=/opt/alfresco/excel2html/html-embed-images.jar
 #Transformer settings
 content.transformer.ExcelToHtml.priority=30
 content.transformer.ExcelToHtml.extensions.xls.html.supported=true
