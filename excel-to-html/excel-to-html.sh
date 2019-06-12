@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Script to launch convert an excel file to HTML and embed images using LibreOffice
-# Usage: excel-to-html.sh /path/to/spreadsheet.xls /path/to/destination/dir/filename.html /path/to/soffice.bin /path/to/libreoffice_userdir /path/to /optional/path/to/java
+# Usage: excel-to-html.sh /path/to/spreadsheet.xls /path/to/destination/dir/filename.html /path/to/soffice.bin /path/to/libreoffice_userdir /path/to/executables /optional/path/to/java
 
 INPUT_FILE_NAME=$1
 OUTPUT_FILE=$2
@@ -20,27 +20,27 @@ then
 elif [ -z "$INPUT_FILE_NAME" ]
 then
       echo "Input file name is missing (1)"
-      echo "Usage: excel-to-html.sh /path/to/spreadsheet.xls /path/to/destination/dir/filename.html /path/to/soffice.bin /path/to/libreoffice_userdir /path/to /optional/path/to/java"
+      echo "Usage: excel-to-html.sh /path/to/spreadsheet.xls /path/to/destination/dir/filename.html /path/to/soffice.bin /path/to/libreoffice_userdir /path/to/executables /optional/path/to/java"
       exit 1
 elif [ -z "$OUTPUT_FILE" ]
 then
       echo "Output file is missing (2)"
-      echo "Usage: excel-to-html.sh /path/to/spreadsheet.xls /path/to/destination/dir/filename.html /path/to/soffice.bin /path/to/libreoffice_userdir /path/to /optional/path/to/java"
+      echo "Usage: excel-to-html.sh /path/to/spreadsheet.xls /path/to/destination/dir/filename.html /path/to/soffice.bin /path/to/libreoffice_userdir /path/to/executables /optional/path/to/java"
       exit 1
 elif [ -z "$LO_EXEC" ]
 then
       echo "Libreoffice bin is missing (3)"
-      echo "Usage: excel-to-html.sh /path/to/spreadsheet.xls /path/to/destination/dir/filename.html /path/to/soffice.bin /path/to/libreoffice_userdir /path/to /optional/path/to/java"
+      echo "Usage: excel-to-html.sh /path/to/spreadsheet.xls /path/to/destination/dir/filename.html /path/to/soffice.bin /path/to/libreoffice_userdir /path/to/executables /optional/path/to/java"
       exit 1
 elif [ -z "$LO_USER_DIR" ]
 then
       echo "Libreoffice user dir is missing (4)"
-      echo "Usage: excel-to-html.sh /path/to/spreadsheet.xls /path/to/destination/dir/filename.html /path/to/soffice.bin /path/to/libreoffice_userdir /path/to /optional/path/to/java"
+      echo "Usage: excel-to-html.sh /path/to/spreadsheet.xls /path/to/destination/dir/filename.html /path/to/soffice.bin /path/to/libreoffice_userdir /path/to/executables /optional/path/to/java"
       exit 1
 elif [ -z "$EXEC_PATH" ]
 then
       echo "Embedded binary path is missing (5)"
-      echo "Usage: excel-to-html.sh /path/to/spreadsheet.xls /path/to/destination/dir/filename.html /path/to/soffice.bin /path/to/libreoffice_userdir /path/to /optional/path/to/java"
+      echo "Usage: excel-to-html.sh /path/to/spreadsheet.xls /path/to/destination/dir/filename.html /path/to/soffice.bin /path/to/libreoffice_userdir /path/to/executables /optional/path/to/java"
       exit 1
 elif [ -z "$JAVA_BIN" ]
 then

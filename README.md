@@ -89,13 +89,13 @@ Usage: `embed-html-images.sh /path/to/spreadsheet.html /path/to/html-embed-image
 **Alfresco Configuration**
 ```
 #Path to excel-to-html.sh script
-excelToHtml.exe=/opt/alfresco/html-embeded-images/excel-to-html.sh
+excelToHtml.exe=/opt/alfresco/excel2html/excel-to-html.sh
 #Path to LibreOffice binary
 excel.soffice=/usr/lib/libreoffice/program/soffice.bin
 #Temporary directory, used for conversions and LibreOffice temporary files
 excel.libreoffice.user=${java.io.tmpdir}
 #Path Java application which embeds images in html
-excel.embed.images.target=/opt/alfresco/html-embeded-images/html-embed-images.jar
+excel.embed.images.target=/opt/alfresco/excel2html/html-embed-images.jar
 #Transformer settings
 content.transformer.ExcelToHtml.priority=30
 content.transformer.ExcelToHtml.extensions.xls.html.supported=true
