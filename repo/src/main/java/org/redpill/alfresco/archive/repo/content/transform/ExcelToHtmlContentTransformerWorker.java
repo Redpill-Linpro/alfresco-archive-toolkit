@@ -57,11 +57,12 @@ public class ExcelToHtmlContentTransformerWorker extends RuntimeExecutableConten
 
   @Override
   public void afterPropertiesSet() {
-    allowedMimetypes.add(MimetypeMap.MIMETYPE_EXCEL);
-    allowedMimetypes.add(MimetypeMap.MIMETYPE_OPENXML_SPREADSHEET_MACRO);
-    allowedMimetypes.add(MimetypeMap.MIMETYPE_OPENXML_SPREADSHEET_TEMPLATE_MACRO);
-    allowedMimetypes.add(MimetypeMap.MIMETYPE_OPENXML_SPREADSHEET_ADDIN_MACRO);
-    allowedMimetypes.add(MimetypeMap.MIMETYPE_OPENXML_SPREADSHEET_BINARY_MACRO);
+    allowedMimetypes.add(MimetypeMap.MIMETYPE_EXCEL); //xls
+    allowedMimetypes.add(MimetypeMap.MIMETYPE_OPENXML_SPREADSHEET); //xlsx
+    allowedMimetypes.add(MimetypeMap.MIMETYPE_OPENXML_SPREADSHEET_MACRO); //xlsm
+    allowedMimetypes.add(MimetypeMap.MIMETYPE_OPENXML_SPREADSHEET_TEMPLATE_MACRO); //xltm
+    allowedMimetypes.add(MimetypeMap.MIMETYPE_OPENXML_SPREADSHEET_ADDIN_MACRO); //xlam
+    allowedMimetypes.add(MimetypeMap.MIMETYPE_OPENXML_SPREADSHEET_BINARY_MACRO); //xlsb
     super.afterPropertiesSet();
 
   }
