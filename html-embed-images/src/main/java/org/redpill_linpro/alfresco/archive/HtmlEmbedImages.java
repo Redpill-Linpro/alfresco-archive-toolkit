@@ -67,6 +67,8 @@ public class HtmlEmbedImages {
           String embedFilePrefix;
           if (imgFileName.toLowerCase().trim().endsWith(".png")) {
             embedFilePrefix = "data:image/png;base64,";
+          } else if (imgFileName.toLowerCase().trim().endsWith(".jpg") || imgFileName.toLowerCase().trim().endsWith(".jpeg")) {
+            embedFilePrefix = "data:image/jpeg;base64,";
           } else {
             throw new UnsupportedEncodingException("File extension for " + imgFile + " is not supported");
           }
