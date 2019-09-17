@@ -61,7 +61,8 @@ public class HtmlEmbedImages {
           String imgAbsPath = parentAbsPath + "/" + imgFileName;
           File imgFile = new File(imgAbsPath);
           if (!imgFile.exists()) {
-            throw new FileNotFoundException("Referenced image file " + imgFileName + " does not exist");
+            System.out.println("Referenced image file " + imgFileName + " does not exist");
+            continue;
           }
 
           String embedFilePrefix;
@@ -70,7 +71,8 @@ public class HtmlEmbedImages {
           } else if (imgFileName.toLowerCase().trim().endsWith(".jpg") || imgFileName.toLowerCase().trim().endsWith(".jpeg")) {
             embedFilePrefix = "data:image/jpeg;base64,";
           } else {
-            throw new UnsupportedEncodingException("File extension for " + imgFile + " is not supported");
+            System.out.println("File extension for " + imgFile + " is not supported");
+            continue;
           }
 
           //Embed image
