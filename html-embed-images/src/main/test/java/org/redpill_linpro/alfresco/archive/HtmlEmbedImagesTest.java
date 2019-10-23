@@ -99,7 +99,9 @@ public class HtmlEmbedImagesTest {
       String absPath = tempDirectory.toAbsolutePath() + "/family_budget.html";
       new HtmlEmbedImages(absPath, true);
       String contents = new String(Files.readAllBytes(Paths.get(absPath)));
-      assert(!contents.contains("family_budget_html_7acd3ca0932d29a2.png"));
+      assertFalse(contents.contains("family_budget_html_7acd3ca0932d29a2.png"));
+      assertFalse(contents.contains("height=436"));
+
     }
   }
 }
