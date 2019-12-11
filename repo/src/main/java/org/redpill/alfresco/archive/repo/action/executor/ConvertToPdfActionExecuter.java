@@ -298,7 +298,7 @@ public class ConvertToPdfActionExecuter extends ActionExecuterAbstractBase imple
               + "   writer: " + contentWriter + "\n"
               + "   action: " + this);
           }
-          throw new RuleServiceException(TRANSFORMING_ERROR_MESSAGE + e.getMessage());
+          throw new RuleServiceException(TRANSFORMING_ERROR_MESSAGE, e);
         }
 
         //ContentData contentData = contentWriter.getContentData();

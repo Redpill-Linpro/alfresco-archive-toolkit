@@ -137,4 +137,44 @@
     <property name="archiveToolkitService" ref="rl.archiveToolkitService" />
   </bean>
 
+  <bean id="archive-toolkit-vera-pdf-validation" class="org.redpill.alfresco.archive.repo.action.executor.VeraPdfValidatorActionExecuter" parent="action-executer">
+    <property name="checkCommand">
+      <bean class="org.alfresco.util.exec.RuntimeExec">
+        <property name="commandsAndArguments">
+          <map>
+            <entry key=".*">
+              <list>
+                <value>${verapdf.exe}</value>
+                <value>--version</value>
+              </list>
+            </entry>
+          </map>
+        </property>
+        <property name="errorCodes">
+          <value>1</value>
+        </property>
+      </bean>
+    </property>
+
+    <property name="validationCommand">
+      <bean class="org.alfresco.util.exec.RuntimeExec">
+        <property name="commandsAndArguments">
+          <map>
+            <entry key=".*">
+              <list>
+                <value>${verapdf.exe}</value>
+                <value>${flavour}</value>
+                <value>${source}</value>
+              </list>
+            </entry>
+          </map>
+        </property>
+        <property name="errorCodes">
+          <value>1</value>
+        </property>
+      </bean>
+    </property>
+  </bean>
+
+
 </beans>
