@@ -22,11 +22,8 @@ import org.redpill.alfresco.archive.repo.model.ArchiveToolkitModel;
 import org.redpill.alfresco.test.AbstractRepoIntegrationTest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.verapdf.pdfa.*;
-import org.verapdf.pdfa.flavours.PDFAFlavour;
 
 import java.io.File;
-import java.io.InputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -64,25 +61,6 @@ public class ConvertToPdfActionExecuterIntegrationTest extends AbstractRepoInteg
   }
 
 
-  protected boolean validatePdfaVeraPdf(InputStream is) throws Exception {
-    // The veraPDF library is unaware of the implementations and needs to be
-    // initialised before first use
-    VeraGreenfieldFoundryProvider.initialise();
-    PDFAParser parser;
-    PDFAFlavour flavour = PDFAFlavour.PDFA_1_B;
-    org.verapdf.pdfa.results.ValidationResult vr = null;
-    try (VeraPDFFoundry foundry = Foundries.defaultInstance();
-         PDFAValidator validator = foundry.createValidator(flavour, false)) {
-      parser = foundry.createParser(is, flavour);
-      vr = validator.validate(parser);
-
-      if (vr == null || !vr.isCompliant()) {
-        throw new Exception("Failed to validate pdf/a, test Assertions: " + (vr == null ? "null" : (vr.getTestAssertions().toString())));
-      }
-    }
-    return vr.isCompliant();
-  }
-
   @Test
   public void testConvertOdtToPdf() throws Exception {
 
@@ -111,11 +89,7 @@ public class ConvertToPdfActionExecuterIntegrationTest extends AbstractRepoInteg
     assertNotNull(pdfNodeRef);
     //Assert that there is a child node with name pdf.pdf
     assertEquals("pdf.pdf", _nodeService.getProperty(pdfNodeRef, ContentModel.PROP_NAME));
-    ContentReader reader = _contentService.getReader(pdfNodeRef, ContentModel.PROP_CONTENT);
-    try (InputStream is = reader.getContentInputStream()) {
-      boolean result = validatePdfaVeraPdf(is);
-      assertFalse("Expected invalid pdf", result);
-    }
+
   }
 
   protected void testConvert(String fileName) throws Exception {
@@ -157,10 +131,7 @@ public class ConvertToPdfActionExecuterIntegrationTest extends AbstractRepoInteg
 //      is.close();
     }
     reader = _contentService.getReader(pdfANodeRef, ContentModel.PROP_CONTENT);
-    try (InputStream is = reader.getContentInputStream()) {
-      boolean result = validatePdfaVeraPdf(is);
-      assertTrue("Expected valid pdf", result);
-    }
+
     ContentData contentData = reader.getContentData();
 
     assertEquals("Wrong mimetype", MimetypeMap.MIMETYPE_PDF, contentData.getMimetype());
@@ -169,26 +140,6 @@ public class ConvertToPdfActionExecuterIntegrationTest extends AbstractRepoInteg
     // Assert there is a checksum written.
     String checksum = (String) _nodeService.getProperty(pdfANodeRef, ArchiveToolkitModel.PROP_CHECKSUM);
     assertNotNull(checksum);
-  }
-
-  //@Test
-  public void testConvertRGBPdfToPdfa() throws Exception {
-    testConvert("test.pdf");
-  }
-
-  //@Test
-  public void testConvertCMYKPdfToPdfa() throws Exception {
-    testConvert("cmyk.pdf");
-  }
-
-  //@Test
-  public void testConvertCallasProblematicPdfToPdfa() throws Exception {
-    testConvert("callas.pdf");
-  }
-
-  //@Test
-  public void testConvertExportedWebPagePdfToPdfa() throws Exception {
-    testConvert("webpage.pdf");
   }
 
   @Test
