@@ -24,6 +24,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Make sure this action is called from a new read-only transaction to prevent failure to destroy your current transaction
+ */
 public class VeraPdfValidatorActionExecuter extends ActionExecuterAbstractBase implements InitializingBean {
   public static final String NAME = "archive-toolkit-vera-pdf-validation";
   private final static Log LOG = LogFactory.getLog(VeraPdfValidatorActionExecuter.class);
@@ -84,12 +87,14 @@ public class VeraPdfValidatorActionExecuter extends ActionExecuterAbstractBase i
         throw new VeraPdfValidationException("Error while trying to validate pdf with VeraPDF: " + actionedUponNodeRef, e);
       }
     } else {
+      LOG.error("Validation not possible due to tool not being available.: \" + actionedUponNodeRef");
       throw new VeraPdfValidationException("Validation not possible due to tool not being available.: " + actionedUponNodeRef);
     }
 
     if (result == null || !result.contains(XML_VALIDATION_COMPLIANT)) {
-      LOG.error("PDF/a Validation failed: " + actionedUponNodeRef);
-      throw new VeraPdfValidationException("PDF/a Validation failed: " + actionedUponNodeRef);
+      LOG.debug("PDF/a Validation failed: " + actionedUponNodeRef);
+      LOG.trace(result);
+      throw new VeraPdfValidationException("PDF/a Validation failed: " + actionedUponNodeRef, result);
     }
   }
 
