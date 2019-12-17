@@ -26,8 +26,10 @@
           <map>
             <entry key=".*">
               <list>
-                <value>${pdf2archive.exe}</value>
-                <value>--version</value>
+                <value>${pdf2pdfa.check.exe}</value>
+                <value>${pdf2pdfa.libreoffice.exe}</value>
+                <value>${pdf2pdfa.libreoffice.user}</value>
+                <value>${pdf2pdfa.validation.testFile}</value>
               </list>
             </entry>
           </map>
@@ -44,8 +46,9 @@
           <map>
             <entry key=".*">
               <list>
-                <value>${pdf2archive.exe}</value>
-                <value>${pdf2archive.extraflags}</value>
+                <value>${pdf2pdfa.transform.exe}</value>
+                <value>${pdf2pdfa.libreoffice.exe}</value>
+                <value>${pdf2pdfa.libreoffice.user}</value>
                 <value>${source}</value>
                 <value>${target}</value>
               </list>

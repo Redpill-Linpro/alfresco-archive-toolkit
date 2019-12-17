@@ -119,8 +119,7 @@ public class ConvertToPdfActionExecuter extends ActionExecuterAbstractBase imple
   }
 
   /**
-   * @see org.alfresco.repo.action.executer.ActionExecuterAbstractBase#executeImpl(org.alfresco.service.cmr.repository.NodeRef,
-   * org.alfresco.service.cmr.repository.NodeRef)
+   * @see org.alfresco.repo.action.executer.ActionExecuterAbstractBase#executeImpl(Action, NodeRef)
    */
   @Override
   protected void executeImpl(Action ruleAction, NodeRef actionedUponNodeRef) {
@@ -189,7 +188,7 @@ public class ConvertToPdfActionExecuter extends ActionExecuterAbstractBase imple
 
         //Set a timeout
         if (LOGGER.isTraceEnabled()) {
-          LOGGER.trace("Settting timeout to " + timeout);
+          LOGGER.trace("Setting timeout to " + timeout);
         }
         options.setTimeoutMs(timeout);
 
@@ -448,7 +447,7 @@ public class ConvertToPdfActionExecuter extends ActionExecuterAbstractBase imple
    * @param contentWriter      the destination reader
    * @param timeout            timeout in ms for the transformation
    */
-  protected void doTransform(Action ruleAction,
+  protected synchronized void doTransform(Action ruleAction,
                              NodeRef sourceNodeRef, ContentReader contentReader,
                              NodeRef destinationNodeRef, ContentWriter contentWriter, Long timeout) {
     // transform - will throw NoTransformerException if there are no transformers
@@ -463,7 +462,7 @@ public class ConvertToPdfActionExecuter extends ActionExecuterAbstractBase imple
    * If the original name seems to end with a reasonable file extension, then
    * the name will be transformed such that the old extension is replaced with
    * the new. Otherwise the name will be returned unaltered.
-   * <p/>
+   *
    * The original name will be deemed to have a reasonable extension if there
    * are one or more characters after the (required) final dot, none of which
    * are spaces.
@@ -534,7 +533,7 @@ public class ConvertToPdfActionExecuter extends ActionExecuterAbstractBase imple
   /**
    * Sets the transaction helper
    *
-   * @param retryingTransactionHelper
+   * @param retryingTransactionHelper transaction helper
    */
   public void setRetryingTransactionHelper(RetryingTransactionHelper retryingTransactionHelper) {
     this.retryingTransactionHelper = retryingTransactionHelper;
@@ -543,7 +542,7 @@ public class ConvertToPdfActionExecuter extends ActionExecuterAbstractBase imple
   /**
    * Sets the audit component
    *
-   * @param auditComponent
+   * @param auditComponent audit component
    */
   public void setAuditComponent(AuditComponent auditComponent) {
     this.auditComponent = auditComponent;
@@ -552,7 +551,7 @@ public class ConvertToPdfActionExecuter extends ActionExecuterAbstractBase imple
   /**
    * Set the mime type service
    *
-   * @param mimetypeService
+   * @param mimetypeService mimetype service
    */
   public void setMimetypeService(MimetypeService mimetypeService) {
     this.mimetypeService = mimetypeService;
@@ -561,7 +560,7 @@ public class ConvertToPdfActionExecuter extends ActionExecuterAbstractBase imple
   /**
    * Set the node service
    *
-   * @param nodeService
+   * @param nodeService node service
    */
   public void setNodeService(NodeService nodeService) {
     this.nodeService = nodeService;
@@ -570,7 +569,7 @@ public class ConvertToPdfActionExecuter extends ActionExecuterAbstractBase imple
   /**
    * Set the service to determine check-in and check-out status
    *
-   * @param checkOutCheckInService
+   * @param checkOutCheckInService checkout checkin service
    */
   public void setCheckOutCheckInService(CheckOutCheckInService checkOutCheckInService) {
     this.checkOutCheckInService = checkOutCheckInService;
@@ -579,7 +578,7 @@ public class ConvertToPdfActionExecuter extends ActionExecuterAbstractBase imple
   /**
    * Set the dictionary service
    *
-   * @param dictionaryService
+   * @param dictionaryService dictionary service
    */
   @Override
   public void setDictionaryService(DictionaryService dictionaryService) {
@@ -589,7 +588,7 @@ public class ConvertToPdfActionExecuter extends ActionExecuterAbstractBase imple
   /**
    * Set the content service
    *
-   * @param contentService
+   * @param contentService content service
    */
   public void setContentService(ContentService contentService) {
     this.contentService = contentService;
@@ -598,12 +597,17 @@ public class ConvertToPdfActionExecuter extends ActionExecuterAbstractBase imple
   /**
    * Set the copy service
    *
-   * @param copyService
+   * @param copyService copy service
    */
   public void setCopyService(CopyService copyService) {
     this.copyService = copyService;
   }
 
+  /**
+   * Set the rendition service
+   *
+   * @param renditionService rendition service
+   */
   public void setRenditionService(RenditionService renditionService) {
     this.renditionService = renditionService;
   }
@@ -611,12 +615,16 @@ public class ConvertToPdfActionExecuter extends ActionExecuterAbstractBase imple
   /**
    * Set the file folder service
    *
-   * @param fileFolderService
+   * @param fileFolderService file folder service
    */
   public void setFileFolderService(FileFolderService fileFolderService) {
     this.fileFolderService = fileFolderService;
   }
 
+  /**
+   * Set the archive toolkit service
+   * @param archiveToolkitService archive toolkit service
+   */
   public void setArchiveToolkitService(ArchiveToolkitService archiveToolkitService) {
     this.archiveToolkitService = archiveToolkitService;
   }
