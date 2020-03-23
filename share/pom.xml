@@ -5,7 +5,7 @@
   <parent>
     <groupId>org.redpill-linpro.alfresco.archive</groupId>
     <artifactId>alfresco-archive-toolkit</artifactId>
-    <version>1.3.1</version>
+    <version>1.4.0</version>
   </parent>
   <artifactId>alfresco-archive-toolkit-share</artifactId>
   <packaging>jar</packaging>
