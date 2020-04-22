@@ -47,7 +47,7 @@ public class ExcelToHtmlContentTransformerWorker extends RuntimeExecutableConten
     }
     if (allowedMimetypes.contains(sourceMimetype) && MimetypeMap.MIMETYPE_HTML.equals(targetMimetype)) {
       if (logger.isTraceEnabled()) {
-        logger.trace("Transform between "+MimetypeMap.MIMETYPE_EXCEL+" to "+MimetypeMap.MIMETYPE_HTML+" return true");
+        logger.trace("Transform from "+MimetypeMap.MIMETYPE_EXCEL+" to "+MimetypeMap.MIMETYPE_HTML+" return true");
       }
       return true;
     } else {

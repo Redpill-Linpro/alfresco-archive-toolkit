@@ -66,7 +66,7 @@ public class VeraPdfValidatorActionExecuter extends ActionExecuterAbstractBase i
           File veraPdfValidation = TempFileProvider.createTempFile(contentInputStream, "VeraPdfValidation", ".pdf");
           Map<String, String> validationParams = new HashMap<>();
           validationParams.put("source", veraPdfValidation.getAbsolutePath());
-          validationParams.put("flavour", "--flavour " + validationFlavour);
+          validationParams.put("flavour", validationFlavour);
           final RuntimeExec.ExecutionResult execute = validationCommand.execute(validationParams);
 
           if (execute.getSuccess()) {

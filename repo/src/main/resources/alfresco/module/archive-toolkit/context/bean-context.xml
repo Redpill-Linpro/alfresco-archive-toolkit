@@ -166,6 +166,7 @@
             <entry key=".*">
               <list>
                 <value>${verapdf.exe}</value>
+                <value>-f</value>
                 <value>${flavour}</value>
                 <value>${source}</value>
               </list>
