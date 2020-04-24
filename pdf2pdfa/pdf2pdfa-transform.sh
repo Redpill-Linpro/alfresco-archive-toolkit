@@ -2,12 +2,13 @@
 
 SOFFICE_BIN=$1
 SOFFICE_USER=$2
-INPUT_FILE=$3
-OUTPUT_FILE=$4
+TIMEOUT_VAR=$3
+INPUT_FILE=$4
+OUTPUT_FILE=$5
 TEMP_DIR=$SOFFICE_USER/transformtmp
-TIMEOUT_VAR=${PDF_TRANSFORM_TIMEOUT:-60}
 
-USAGE="Usage: pdf2pdfa-transform.sh /path/to/soffice /path/to/soffice/user /path/to/inputfile.pdf /path/to/outputfile.pdf"
+
+USAGE="Usage: pdf2pdfa-transform.sh /path/to/soffice /path/to/soffice/user 60 /path/to/inputfile.pdf /path/to/outputfile.pdf"
 PDFA_CONFIG="<item oor:path=\"/org.openoffice.Office.Common/Filter/PDF/Export\"><prop oor:name=\"ExportBookmarks\" oor:op=\"fuse\"><value>false</value></prop></item>\n<item oor:path=\"/org.openoffice.Office.Common/Filter/PDF/Export\"><prop oor:name=\"ReduceImageResolution\" oor:op=\"fuse\"><value>false</value></prop></item>\n<item oor:path=\"/org.openoffice.Office.Common/Filter/PDF/Export\"><prop oor:name=\"SelectPdfVersion\" oor:op=\"fuse\"><value>1</value></prop></item>\n<item oor:path=\"/org.openoffice.Office.Common/Filter/PDF/Export\"><prop oor:name=\"UseLosslessCompression\" oor:op=\"fuse\"><value>true</value></prop></item>\n"
 
 if [ -z "$SOFFICE_BIN" ]
@@ -20,14 +21,19 @@ then
       echo "Path to soffice user dir is missing (2)"
       echo $USAGE
       exit 1
+elif [ -z "$TIMEOUT_VAR" ]
+then
+      echo "Timeout var is missing (3)"
+      echo $USAGE
+      exit 1
 elif [ -z "$INPUT_FILE" ]
 then
-      echo "Path to input file is missing (3)"
+      echo "Path to input file is missing (4)"
       echo $USAGE
       exit 1
 elif [ -z "$OUTPUT_FILE" ]
 then
-      echo "Path to output file is missing (4)"
+      echo "Path to output file is missing (5)"
       echo $USAGE
       exit 1
 fi

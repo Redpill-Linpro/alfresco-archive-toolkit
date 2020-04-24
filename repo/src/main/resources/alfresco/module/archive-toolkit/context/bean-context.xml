@@ -49,6 +49,7 @@
                 <value>${pdf2pdfa.transform.exe}</value>
                 <value>${pdf2pdfa.libreoffice.exe}</value>
                 <value>${pdf2pdfa.libreoffice.user}</value>
+                <value>${pdf2pdfa.timeout}</value>
                 <value>${source}</value>
                 <value>${target}</value>
               </list>
