@@ -13,7 +13,7 @@
 
   <groupId>org.redpill-linpro.alfresco.archive</groupId>
   <artifactId>alfresco-archive-toolkit</artifactId>
-  <version>1.4.0</version>
+  <version>1.5.0</version>
   <name>Alfresco Archive Toolkit</name>
   <packaging>pom</packaging>
 
