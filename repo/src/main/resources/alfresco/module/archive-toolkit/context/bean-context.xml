@@ -139,6 +139,7 @@
       </list>
     </property>
     <property name="archiveToolkitService" ref="rl.archiveToolkitService" />
+    <property name="defaultTimeout" value="${archiveToolkit.transform.timeoutMs}" />
   </bean>
 
   <bean id="archive-toolkit-vera-pdf-validation" class="org.redpill.alfresco.archive.repo.action.executor.VeraPdfValidatorActionExecuter" parent="action-executer">
