@@ -82,7 +82,6 @@ public class ConvertToPdfActionExecuter extends ActionExecuterAbstractBase imple
   public static final String PARAM_SOURCE_FILENAME = "source-filename";
   public static final String PARAM_TARGET_TYPE = "target-type";
   public static final String PARAM_TIMEOUT = "timeout";
-  public static final Long DEFAULT_TIMEOUT = 60000L; //Timeout in MS
   public static final String AUDIT_APPLICATION_NAME = "alfresco-archive-toolkit";
   /*
    * Injected services
@@ -98,6 +97,7 @@ public class ConvertToPdfActionExecuter extends ActionExecuterAbstractBase imple
   protected FileFolderService fileFolderService;
   protected ArchiveToolkitService archiveToolkitService;
   protected RenditionService renditionService;
+  protected Long defaultTimeout;
 
   /**
    * Add parameter definitions
@@ -142,7 +142,7 @@ public class ConvertToPdfActionExecuter extends ActionExecuterAbstractBase imple
 
       Long timeout = (Long) ruleAction.getParameterValue(PARAM_TIMEOUT);
       if (timeout == null) {
-        timeout = DEFAULT_TIMEOUT;
+        timeout = defaultTimeout;
       }
       try {
         {
@@ -629,6 +629,10 @@ public class ConvertToPdfActionExecuter extends ActionExecuterAbstractBase imple
     this.archiveToolkitService = archiveToolkitService;
   }
 
+  public void setDefaultTimeout(Long defaultTimeout) {
+    this.defaultTimeout = defaultTimeout;
+  }
+
   @Override
   public void afterPropertiesSet() throws Exception {
     Assert.notNull(dictionaryService);
@@ -645,6 +649,7 @@ public class ConvertToPdfActionExecuter extends ActionExecuterAbstractBase imple
     Assert.notNull(fileFolderService);
     Assert.notNull(archiveToolkitService);
     Assert.notNull(renditionService);
+    Assert.notNull(defaultTimeout);
   }
 
 }
