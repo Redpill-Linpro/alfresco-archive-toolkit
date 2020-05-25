@@ -42,6 +42,7 @@ public class VeraPdfValidatorActionExecuter extends ActionExecuterAbstractBase i
    * Parameters
    */
   public static final String PARAM_VALIDATION_FLAVOUR = "validation-flavour";
+  public static final String RESULT_OK = "OK";
 
   @Override
   protected void executeImpl(Action action, NodeRef actionedUponNodeRef) {
@@ -80,21 +81,26 @@ public class VeraPdfValidatorActionExecuter extends ActionExecuterAbstractBase i
           }
         } catch (Exception e) {
           LOG.error("Error while trying to validate pdf with VeraPDF", e);
-          throw new VeraPdfValidationException("Error while trying to validate pdf with VeraPDF: " + actionedUponNodeRef, e);
+          action.setParameterValue(PARAM_RESULT, "Error while trying to validate pdf with VeraPDF: " + actionedUponNodeRef);
+          return;
         }
       } catch (IOException e) {
         LOG.error("Error while trying to validate pdf with VeraPDF", e);
-        throw new VeraPdfValidationException("Error while trying to validate pdf with VeraPDF: " + actionedUponNodeRef, e);
+        action.setParameterValue(PARAM_RESULT, "Error while trying to validate pdf with VeraPDF: " + actionedUponNodeRef);
+        return;
       }
     } else {
       LOG.error("Validation not possible due to tool not being available.: \" + actionedUponNodeRef");
-      throw new VeraPdfValidationException("Validation not possible due to tool not being available.: " + actionedUponNodeRef);
+      action.setParameterValue(PARAM_RESULT, "Validation not possible due to tool not being available.: " + actionedUponNodeRef);
+      return;
     }
 
     if (result == null || !result.contains(XML_VALIDATION_COMPLIANT)) {
       LOG.debug("PDF/a Validation failed: " + actionedUponNodeRef);
       LOG.trace(result);
-      throw new VeraPdfValidationException("PDF/a Validation failed: " + actionedUponNodeRef, result);
+      action.setParameterValue(PARAM_RESULT, "PDF/a Validation failed: " + actionedUponNodeRef + ". Details: " + result);
+    } else {
+      action.setParameterValue(PARAM_RESULT, RESULT_OK);
     }
   }
 
@@ -105,6 +111,7 @@ public class VeraPdfValidatorActionExecuter extends ActionExecuterAbstractBase i
   @Override
   protected void addParameterDefinitions(List<ParameterDefinition> paramList) {
     paramList.add(new ParameterDefinitionImpl(PARAM_VALIDATION_FLAVOUR, DataTypeDefinition.TEXT, false, getParamDisplayLabel(PARAM_VALIDATION_FLAVOUR)));
+    paramList.add(new ParameterDefinitionImpl(PARAM_RESULT, DataTypeDefinition.TEXT, false, getParamDisplayLabel(PARAM_RESULT)));
   }
 
 
