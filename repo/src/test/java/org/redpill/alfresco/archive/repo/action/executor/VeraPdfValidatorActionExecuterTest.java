@@ -16,8 +16,9 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.alfresco.repo.action.executer.ActionExecuter.PARAM_RESULT;
+import static org.junit.Assert.*;
+import static org.redpill.alfresco.archive.repo.action.executor.VeraPdfValidatorActionExecuter.RESULT_OK;
 
 public class VeraPdfValidatorActionExecuterTest {
   Mockery m;
@@ -79,9 +80,14 @@ public class VeraPdfValidatorActionExecuterTest {
         will(returnValue(contentReader));
         oneOf(contentReader).getContentInputStream();
         will(returnValue(pdfaResourceStream));
+        oneOf(action).setParameterValue(PARAM_RESULT, RESULT_OK);
+        oneOf(action).getParameterValue(PARAM_RESULT);
+        will(returnValue(RESULT_OK));
       }
     });
     ae.execute(action, nodeRef);
+    final String result = (String) action.getParameterValue(PARAM_RESULT);
+    assertEquals(RESULT_OK, result);
   }
 
   @Test
@@ -97,9 +103,14 @@ public class VeraPdfValidatorActionExecuterTest {
         will(returnValue(contentReader));
         oneOf(contentReader).getContentInputStream();
         will(returnValue(pdfaResourceStream));
+        oneOf(action).setParameterValue(PARAM_RESULT, RESULT_OK);
+        oneOf(action).getParameterValue(PARAM_RESULT);
+        will(returnValue(RESULT_OK));
       }
     });
     ae.execute(action, nodeRef);
+    final String result = (String) action.getParameterValue(PARAM_RESULT);
+    assertEquals(RESULT_OK, result);
   }
 
   @Test
@@ -178,14 +189,16 @@ public class VeraPdfValidatorActionExecuterTest {
         will(returnValue(contentReader));
         oneOf(contentReader).getContentInputStream();
         will(returnValue(pdfResourceStream));
+        oneOf(action).setParameterValue(with(PARAM_RESULT), with(any(String.class)));
+        oneOf(action).getParameterValue(PARAM_RESULT);
+        will(returnValue("PDF/a Validation failed: test://node/id. ...asdf..."));
       }
     });
-    try {
-      ae.execute(action, nodeRef);
-      assertTrue(false);
-    } catch (VeraPdfValidationException e) {
-      assertEquals("PDF/a Validation failed: " + nodeRef, e.getMessage());
-    }
+    ae.execute(action, nodeRef);
+    final String result = (String) action.getParameterValue(PARAM_RESULT);
+    assertNotEquals(RESULT_OK, result);
+    assertTrue(result.contains("PDF/a Validation failed: " + nodeRef));
+
   }
 
 }
