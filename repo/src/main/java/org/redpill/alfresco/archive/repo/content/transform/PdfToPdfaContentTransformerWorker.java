@@ -69,6 +69,8 @@ public class PdfToPdfaContentTransformerWorker extends RuntimeExecutableContentT
     allowedMimetypes.add(MimetypeMap.MIMETYPE_OPENXML_WORD_TEMPLATE); //dotx
     allowedMimetypes.add(MimetypeMap.MIMETYPE_OPENXML_WORD_TEMPLATE_MACRO); //dotm
 
+    //Text
+    allowedMimetypes.add(MimetypeMap.MIMETYPE_TEXT_PLAIN);
     super.afterPropertiesSet();
 
   }
