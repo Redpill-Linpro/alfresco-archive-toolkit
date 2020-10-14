@@ -7,7 +7,7 @@
 
   <groupId>org.redpill-linpro.alfresco.archive</groupId>
   <artifactId>html-embed-images</artifactId>
-  <version>1.5.2</version>
+  <version>1.5.3</version>
 
   <name>HTML Embed Images</name>
   <packaging>jar</packaging>
