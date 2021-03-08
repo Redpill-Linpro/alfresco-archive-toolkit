@@ -1,4 +1,4 @@
-# Vgregion Excel to Html T-Engine
+# RlArchive Excel to Html T-Engine
 
 ## Purpose
 
@@ -23,34 +23,34 @@ The container is automatically destroyed on exit.
 
 To use this T-Engine, some configurations are required. These are listed below, with their default values:
 ````
-se.vgregion.alfresco.libreoffice.exe=/opt/libreoffice6.4/program/soffice
-se.vgregion.alfresco.temp.transform.dir=${java.io.tmpdir}/excel2html
-se.vgregion.alfresco.script.exec.exe=${se.vgregion.alfresco.script.exec.path}/excel-to-html.sh
-se.vgregion.alfresco.script.exec.path=/opt/excel2html
+rl.archive.alfresco.libreoffice.exe=/opt/libreoffice6.4/program/soffice
+rl.archive.alfresco.temp.transform.dir=${java.io.tmpdir}/excel2html
+rl.archive.alfresco.script.exec.exe=${rl.archive.alfresco.script.exec.path}/excel-to-html.sh
+rl.archive.alfresco.script.exec.path=/opt/excel2html
 ````
 These are credentials for the remote transformation engine.
 
 Use:
 `````
-se.vgregion.alfresco.libreoffice.exe
+rl.archive.alfresco.libreoffice.exe
 `````
 to point to the libreoffice soffice bin.
 
 Use:
 `````
-se.vgregion.alfresco.temp.transform.dir
+rl.archive.alfresco.temp.transform.dir
 `````
 to point to a directory used to store temporary transformation files.
 
 Use:
 `````
-se.vgregion.alfresco.script.exec.exe
+rl.archive.alfresco.script.exec.exe
 `````
 to point to the excel-to-html.sh script file.
 
 Use:
 `````
-se.vgregion.alfresco.script.exec.path
+rl.archive.alfresco.script.exec.path
 `````
 to point to the directory containing the excel-2-html script files.
 
@@ -97,10 +97,10 @@ When deploying this T-Engine as a jar file, use the following commands:
 ```
 #!/bin/sh
 java
--De.vgregion.alfresco.libreoffice.exe="SOFFICE_BIN"
--Dse.vgregion.alfresco.temp.transform.dir="TEMP_DIR"
--Dse.vgregion.alfresco.script.exec.exe="SCRIPT_SH_FILE"
--Dse.vgregion.alfresco.script.exec.path="SCRIPT_DIR"
+-Drl.archive.alfresco.libreoffice.exe="SOFFICE_BIN"
+-Drl.archive.alfresco.temp.transform.dir="TEMP_DIR"
+-Drl.archive.alfresco.script.exec.exe="SCRIPT_SH_FILE"
+-Drl.archive.alfresco.script.exec.path="SCRIPT_DIR"
 -jar /opt/alfresco/e2h/excel-2-html-t-engine.jar
 ```
 
@@ -108,10 +108,10 @@ java
 
 ````
 java
--De.vgregion.alfresco.libreoffice.exe="SOFFICE_BIN"
--Dse.vgregion.alfresco.temp.transform.dir="TEMP_DIR"
--Dse.vgregion.alfresco.script.exec.exe="SCRIPT_SH_FILE"
--Dse.vgregion.alfresco.script.exec.path="SCRIPT_DIR"
+-Drl.archive.alfresco.libreoffice.exe="SOFFICE_BIN"
+-Drl.archive.alfresco.temp.transform.dir="TEMP_DIR"
+-Drl.archive.alfresco.script.exec.exe="SCRIPT_SH_FILE"
+-Drl.archive.alfresco.script.exec.path="SCRIPT_DIR"
 -DACTIVEMQ_URL="failover:(ACTIVE_MQ_URL)?timeout=3000"
 -DACTIVEMQ_USER: "ACTIVEMQ_USERNAME"
 -DACTIVEMQ_PASSWORD: "ACTIVEMQ_PASSWORD"

@@ -13,7 +13,7 @@ RUN mkdir -p $COPY_DIR
 ADD setup-libreoffice.sh $COPY_DIR
 RUN /bin/bash -xe $COPY_DIR/setup-libreoffice.sh
 
-ENV JAVA_OPTS=""
+ENV JAVA_OPTS="-Djava.security.egd=file:/dev/./urandom"
 
 # Set default user information
 ARG GROUPNAME=Alfresco
@@ -39,7 +39,8 @@ RUN groupadd -g ${GROUPID} ${GROUPNAME} && \
     chgrp -R ${GROUPNAME} /opt/*
 
 EXPOSE 8091
+EXPOSE 8888
 
 USER ${HWUSERNAME}
 
-ENTRYPOINT java $JAVA_OPTS -jar /usr/bin/excel-2-html-t-engine.jar
+ENTRYPOINT java -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=0.0.0.0:8888 $JAVA_OPTS -jar /usr/bin/excel-2-html-t-engine.jar

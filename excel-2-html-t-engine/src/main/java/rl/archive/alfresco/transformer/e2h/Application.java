@@ -24,7 +24,7 @@
  * along with Alfresco. If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
-package se.vgregion.alfresco.transformer.e2h;
+package rl.archive.alfresco.transformer.e2h;
 
 import io.micrometer.core.instrument.MeterRegistry;
 import org.springframework.beans.factory.annotation.Value;
@@ -43,7 +43,7 @@ import org.springframework.context.annotation.ComponentScan;
  */
 @SpringBootApplication
 @EnableAutoConfiguration(exclude = {DataSourceAutoConfiguration.class})
-@ComponentScan({"org.alfresco.transformer", "se.vgregion.alfresco.transformer.e2h"})
+@ComponentScan({"org.alfresco.transformer", "rl.archive.alfresco.transformer.e2h"})
 public class Application {
     @Value("${container.name}")
     private String containerName;

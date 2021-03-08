@@ -1,7 +1,7 @@
 queue:
-  engineRequestQueue: ${TRANSFORM_ENGINE_REQUEST_QUEUE:se.vgregion.alfresco.e2h.t-engine}
+  engineRequestQueue: ${TRANSFORM_ENGINE_REQUEST_QUEUE:rl.archive.alfresco.e2h.t-engine}
 
 logging:
   level:
     org.alfresco.transformer.AbstractTransformerController: debug
-    se.vgregion.alfresco.transformer.eh2.Excel2HtmlEngine: trace
+    rl.archive.alfresco.transformer.eh2.Excel2HtmlEngine: trace

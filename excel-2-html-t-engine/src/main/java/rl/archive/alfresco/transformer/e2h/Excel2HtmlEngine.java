@@ -1,4 +1,4 @@
-package se.vgregion.alfresco.transformer.e2h;
+package rl.archive.alfresco.transformer.e2h;
 
 import org.alfresco.transform.exceptions.TransformException;
 import org.alfresco.transformer.executors.AbstractCommandExecutor;
@@ -20,19 +20,19 @@ public class Excel2HtmlEngine extends AbstractCommandExecutor implements Convers
 
     private static final Log LOG = LogFactory.getLog(Excel2HtmlEngine.class);
 
-    @Value("${se.vgregion.alfresco.libreoffice.exe}")
+    @Value("${rl.archive.alfresco.libreoffice.exe}")
     public String libreOfficeExe;
-    @Value("${se.vgregion.alfresco.temp.transform.dir}")
+    @Value("${rl.archive.alfresco.temp.transform.dir}")
     public String tempTransformDir;
-    @Value("${se.vgregion.alfresco.script.exec.path}")
+    @Value("${rl.archive.alfresco.script.exec.path}")
     public String scriptExecPath;
-    @Value("${se.vgregion.alfresco.script.exec.exe}")
+    @Value("${rl.archive.alfresco.script.exec.exe}")
     public String scriptExecExe;
 
-    @Value("${se.vgregion.alfresco.transform.timeout}")
+    @Value("${rl.archive.alfresco.transform.timeout}")
     public long timeOut;
 
-    @Value("${se.vgregion.alfresco.transform.file.extensions}")
+    @Value("${rl.archive.alfresco.transform.file.extensions}")
     private Set<String> allowedFileExtensions;
 
     @PostConstruct
@@ -66,16 +66,13 @@ public class Excel2HtmlEngine extends AbstractCommandExecutor implements Convers
 
         // execute the transformation
         try {
-            LOG.trace(this.transformCommand.toString());
-            LOG.trace(properties);
+            LOG.info(this.transformCommand.toString());
+            LOG.info(properties);
 
             run(properties, targetFile, timeOut);
         } catch (TransformException e) {
             LOG.error("Failed to transform PDF: ", e);
-            if (targetFile.exists()) {
-                targetFile.delete();
-            }
-            return null;
+            throw e;
         }
 
         long endTime = System.currentTimeMillis();
