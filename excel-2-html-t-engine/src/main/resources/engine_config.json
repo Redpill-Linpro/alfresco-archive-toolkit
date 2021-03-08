@@ -1,0 +1,22 @@
+{
+  "transformOptions":
+  {
+  },
+  "transformers":
+  [
+    {
+      "transformerName": "excel2Html",
+      "supportedSourceAndTargetList":
+      [
+        {"sourceMediaType": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "targetMediaType": "text/html", "priority": 10  },
+        {"sourceMediaType": "application/vnd.openxmlformats-officedocument.spreadsheetml.template", "targetMediaType": "text/html", "priority": 10  },
+        {"sourceMediaType": "application/vnd.ms-excel.sheet.macroenabled.12", "targetMediaType": "text/html", "priority": 10  },
+        {"sourceMediaType": "application/vnd.ms-excel.template.macroenabled.12", "targetMediaType": "text/html", "priority": 10  },
+        {"sourceMediaType": "application/vnd.ms-excel", "targetMediaType": "text/html", "priority": 10  }
+      ],
+      "transformOptions":
+      [
+      ]
+    }
+  ]
+}

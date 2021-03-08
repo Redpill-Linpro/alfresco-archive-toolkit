@@ -106,6 +106,10 @@ content.transformer.ExcelToHtml.extensions.xlsx.html.priority=20
 content.transformer.ExcelToHtml.extensions.xlsx.html.maxSourceSizeKBytes.use.index=9999
 ```
 
+## Excel-2-html t-engine
+The t-engine for the excel-2-html is configured as a subproject.
+For more information about the specifics of its configurations and how to run it, se the separate [README.md](excel-2-html-t-engine/README.md).
+
 License
 -------
 

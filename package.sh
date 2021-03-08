@@ -9,6 +9,7 @@ mv excel2html.zip ../
 rm ./excel2html/*.sh ./excel2html/*.jar
 rmdir ./excel2html
 cd ..
+cp excel2html.zip excel-2-html-t-engine/
 
 #Build pdf2pdfa
 mkdir -p ./buildDir/pdf2pdfa
